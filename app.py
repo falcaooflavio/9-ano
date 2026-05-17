@@ -18,53 +18,41 @@ st.markdown("""
 
 # --- GERADOR DE QUESTÕES ---
 def gerar_questao(subtopico):
-    # Lista de quadrados perfeitos até 100
     quadrados_perfeitos = [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
     
-    # Gerador de coeficientes de -20 a 20 (evitando o zero para manter a estrutura)
-    a = random.choice([x for x in range(-20, 21) if x != 0])
-    b = random.choice([x for x in range(-20, 21) if x != 0])
+    a_pos = random.randint(1, 12)
+    b_pos = random.randint(1, 12)
     v = random.choice(['x', 'y', 'a', 'b'])
     
-    # 1) PRODUTOS NOTÁVEIS (a e b de -20 a 20)
+    # 1) PRODUTOS NOTÁVEIS
     if subtopico == "Quadrado da soma":
-        # (ax + b)² = a²x² + 2abx + b²
-        sinal_central = "+" if (2*a*b) >= 0 else "-"
-        return f"Desenvolva: ({a}{v} + ({b}))²", f"{a**2}{v}² {sinal_central} {abs(2*a*b)}{v} + {b**2}"
+        return f"Desenvolva: ({a_pos}{v} + {b_pos})²", f"{a_pos**2}{v}² + {2*a_pos*b_pos}{v} + {b_pos**2}"
         
     elif subtopico == "Quadrado da diferença":
-        # (ax - b)² = a²x² - 2abx + b²
-        sinal_central = "-" if (2*a*b) >= 0 else "+"
-        return f"Desenvolva: ({a}{v} - ({b}))²", f"{a**2}{v}² {sinal_central} {abs(2*a*b)}{v} + {b**2}"
+        return f"Desenvolva: ({a_pos}{v} - {b_pos})²", f"{a_pos**2}{v}² - {2*a_pos*b_pos}{v} + {b_pos**2}"
         
     elif subtopico == "Produto da soma pela diferença":
-        # (ax + b)(ax - b) = a²x² - b²
-        return f"Desenvolva: ({a}{v} + ({b}))({a}{v} - ({b}))", f"{a**2}{v}² - {b**2}"
+        return f"Desenvolva: ({a_pos}{v} + {b_pos})({a_pos}{v} - {b_pos})", f"{a_pos**2}{v}² - {b_pos**2}"
         
-    # 2) FATORAÇÃO (Fator comum e Agrupamento: -20 a 20 | Quadrados Perfeitos para os demais)
+    # 2) FATORAÇÃO
     elif subtopico == "Fator comum":
-        return f"Fatore: {a}{v}² + {a*b}{v}", f"{a}{v}({v} + {b})" if b >= 0 else f"{a}{v}({v} - {abs(b)})"
+        return f"Fatore: {a_pos}{v}² + {a_pos*b_pos}{v}", f"{a_pos}{v}({v} + {b_pos})"
         
     elif subtopico == "Agrupamento":
-        # x² + ax + bx + ab = (x + a)(x + b)
-        sinal_a = "+" if a >= 0 else "-"
-        sinal_b = "+" if b >= 0 else "-"
-        termo_misto = a + b
-        sinal_misto = "+" if termo_misto >= 0 else "-"
-        termo_ind = a * b
-        sinal_ind = "+" if termo_ind >= 0 else "-"
-        
-        pergunta = f"Fatore: x² {sinal_misto} {abs(termo_misto)}x {sinal_ind} {abs(termo_ind)}"
-        resposta = f"(x {sinal_a} {abs(a)})(x {sinal_b} {abs(b)})"
+        termo_misto = a_pos + b_pos
+        termo_ind = a_pos * b_pos
+        pergunta = f"Fatore: x² + {termo_misto}x + {termo_ind}"
+        resposta = f"(x + {a_pos})(x + {b_pos})"
         return pergunta, resposta
         
     elif subtopico == "Diferença de dois quadrados":
-        # Usa quadrados perfeitos do conjunto selecionado
         qp1 = random.choice(quadrados_perfeitos)
         qp2 = random.choice(quadrados_perfeitos)
         raiz1 = int(math.sqrt(qp1))
         raiz2 = int(math.sqrt(qp2))
-        return f"Fatore: {qp1}{v}² - {qp2}", f"({raiz1}{v} + {raiz2})({raiz1}{v} - {raiz2})"
+        r1_str = "" if raiz1 == 1 else str(raiz1)
+        qp1_str = "" if qp1 == 1 else str(qp1)
+        return f"Fatore: {qp1_str}{v}² - {qp2}", f"({r1_str}{v} + {raiz2})({r1_str}{v} - {raiz2})"
         
     elif subtopico == "Trinômio quadrado perfeito":
         qp1 = random.choice(quadrados_perfeitos)
@@ -72,49 +60,34 @@ def gerar_questao(subtopico):
         raiz1 = int(math.sqrt(qp1))
         raiz2 = int(math.sqrt(qp2))
         termo_central = 2 * raiz1 * raiz2
-        return f"Fatore: {qp1}{v}² + {termo_central}{v} + {qp2}", f"({raiz1}{v} + {raiz2})²"
+        r1_str = "" if raiz1 == 1 else str(raiz1)
+        qp1_str = "" if qp1 == 1 else str(qp1)
+        return f"Fatore: {qp1_str}{v}² + {termo_central}{v} + {qp2}", f"({r1_str}{v} + {raiz2})²"
         
     # 3) EQUAÇÕES DO 2º GRAU
     elif subtopico == "ax² = 0":
-        # a variando de -20 a 20
+        a = random.choice([x for x in range(-20, 21) if x != 0])
         return f"Resolva: {a}x² = 0", "0"
         
     elif subtopico == "ax² + bx = 0":
-        # Para a raiz ser inteira, b deve ser múltiplo de a. Sorteamos a raiz inteira r2.
-        r2 = random.choice([x for x in range(-20, 21) if x != 0])
-        # ax² + bx = 0 -> x(ax + b) = 0 -> x = 0 ou x = -b/a. Logo, -b/a = r2 -> b = -a * r2
+        a = random.randint(1, 5)
+        r2 = random.choice([x for x in range(-10, 11) if x != 0])
         b_calc = -a * r2
         sinal_b = "+" if b_calc >= 0 else "-"
-        
-        # Organiza as raízes em ordem crescente para validação correta
-        raizes = sorted([0, r2])
-        return f"Resolva: {a}x² {sinal_b} {abs(b_calc)}x = 0", f"{raizes[0]} e {raizes[1]}"
+        return f"Resolva: {a}x² {sinal_b} {abs(b_calc)}x = 0", f"0 e {r2}"
         
     elif subtopico == "ax² + c = 0":
-        # Sorteia se a equação terá raízes reais ou não (50% de chance para cada)
         com_raiz_real = random.choice([True, False])
-        
         if com_raiz_real:
-            # Para ter raiz real exata, -c/a deve ser um quadrado perfeito positivo (ex: 4, 9, 16...)
-            raiz_desejada = random.randint(1, 10) # gera raizes de 1 a 10 (cujos quadrados vão até 100)
+            raiz_desejada = random.randint(1, 10)
             qp = raiz_desejada ** 2
-            
-            # Escolhemos um 'a' de -4 a 4 (exceto 0) para que o 'c' não estoure muito o limite de 100
-            a_limitado = random.choice([x for x in range(-4, 5) if x != 0])
-            # qp = -c / a -> c = -qp * a
+            a_limitado = random.randint(1, 4)
             c_calc = -qp * a_limitado
-            
-            sinal_c = "+" if c_calc >= 0 else "-"
-            return f"Resolva: {a_limitado}x² {sinal_c} {abs(c_calc)} = 0", f"-{raiz_desejada} e {raiz_desejada}"
+            return f"Resolva: {a_limitado}x² - {abs(c_calc)} = 0", f"-{raiz_desejada} e {raiz_desejada}"
         else:
-            # Caso não tenha raiz real: a e c precisam ter o mesmo sinal (assim -c/a fica negativo)
-            a_limitado = random.choice([x for x in range(-10, 11) if x != 0])
-            c_calc = random.choice([x for x in range(1, 101)])
-            if a_limitado < 0:
-                c_calc = -c_calc # Garante que possuem o mesmo sinal
-                
-            sinal_c = "+" if c_calc >= 0 else "-"
-            return f"Resolva: {a_limitado}x² {sinal_c} {abs(c_calc)} = 0", "nao possui raiz real"
+            a_limitado = random.randint(1, 5)
+            c_calc = random.randint(1, 50)
+            return f"Resolva: {a_limitado}x² + {c_calc} = 0", "nao possui raiz real"
             
     return "2 + 2", "4"
 
@@ -125,6 +98,7 @@ if 'tela' not in st.session_state:
     st.session_state.turma = ''
     st.session_state.acertos = 0
     st.session_state.num_questao = 1
+    st.session_state.respondido = False
 
 # --- TELA 1: IDENTIFICAÇÃO ---
 if st.session_state.tela == 'inicio':
@@ -173,6 +147,9 @@ elif st.session_state.tela == 'subtopicos':
             st.session_state.subtopico = opcao
             st.session_state.pergunta, st.session_state.resposta_certa = gerar_questao(opcao)
             st.session_state.tela = 'quiz'
+            st.session_state.num_questao = 1
+            st.session_state.acertos = 0
+            st.session_state.respondido = False
             st.rerun()
 
 # --- TELA 4: O QUIZ EM SI ---
@@ -180,30 +157,50 @@ elif st.session_state.tela == 'quiz':
     st.write(f"**Questão {st.session_state.num_questao} de 10** — Conteúdo: *{st.session_state.subtopico}*")
     st.markdown(f"## {st.session_state.pergunta}")
     
-    st.caption("Dica de formatação: não use espaços na sua resposta. Para duas raízes, use o formato: 'val1 e val2' ou 'nao possui raiz real' se for o caso.")
-    resposta_aluno = st.text_input("Sua resposta:", key=f"resp_{st.session_state.num_questao}")
+    st.caption("Dica de formatação: Não use espaços. Para duas raízes, use o formato: 'val1 e val2' ou 'nao possui raiz real'.")
     
-    if st.button("Enviar Resposta"):
-        # Normalização básica para ajudar na correção de strings (remove espaços, acentos comuns e deixa minúsculo)
-        resp_limpa_aluno = resposta_aluno.replace(" ", "").lower().replace("ã", "a").replace("ó", "o")
-        resp_limpa_certa = st.session_state.resposta_certa.replace(" ", "").lower().replace("ã", "a").replace("ó", "o")
-        
-        if resp_limpa_aluno == resp_limpa_certa:
-            st.success("Correto! 🎉")
-            st.session_state.acertos += 1
-        else:
-            st.error(f"Errado. A resposta correta era: {st.session_state.resposta_certa}")
-            
-        if st.session_state.num_questao < 10:
-            st.session_state.num_questao += 1
-            st.session_state.pergunta, st.session_state.resposta_certa = gerar_questao(st.session_state.subtopico)
-            st.button("Próxima Questão")
-        else:
-            # Salva o resultado localmente no servidor do site
-            with open("resultados.csv", "a", encoding="utf-8") as f:
-                f.write(f"{st.session_state.nome},{st.session_state.turma},{st.session_state.subtopico},{st.session_state.acertos}\n")
-            st.session_state.tela = 'fim'
-            st.rerun()
+    # Desabilita o campo se o aluno já enviou a resposta para ele ver o feedback antes de avançar
+    resposta_aluno = st.text_input("Sua resposta:", key=f"resp_{st.session_state.num_questao}", disabled=st.session_state.respondido)
+    
+    if not st.session_state.respondido:
+        if st.button("Enviar Resposta"):
+            if resposta_aluno.strip() == "":
+                st.warning("Por favor, digite uma resposta antes de enviar.")
+            else:
+                resp_limpa_aluno = resposta_aluno.replace(" ", "").lower().replace("ã", "a").replace("ó", "o")
+                resp_limpa_certa = st.session_state.resposta_certa.replace(" ", "").lower().replace("ã", "a").replace("ó", "o")
+                
+                sucesso = False
+                if "e" in resp_limpa_certa:
+                    partes_certas = resp_limpa_certa.split("e")
+                    if "e" in resp_limpa_aluno:
+                        partes_aluno = resp_limpa_aluno.split("e")
+                        if sorted(partes_certas) == sorted(partes_aluno):
+                            sucesso = True
+                else:
+                    if resp_limpa_aluno == resp_limpa_certa:
+                        sucesso = True
+
+                if sucesso:
+                    st.success("Correto! 🎉")
+                    st.session_state.acertos += 1
+                else:
+                    st.error(f"Errado. A resposta correta era: {st.session_state.resposta_certa}")
+                
+                st.session_state.respondido = True
+                st.rerun()
+    else:
+        if st.button("Avançar"):
+            if st.session_state.num_questao < 10:
+                st.session_state.num_questao += 1
+                st.session_state.pergunta, st.session_state.resposta_certa = gerar_questao(st.session_state.subtopico)
+                st.session_state.respondido = False
+                st.rerun()
+            else:
+                with open("resultados.csv", "a", encoding="utf-8") as f:
+                    f.write(f"{st.session_state.nome},{st.session_state.turma},{st.session_state.subtopico},{st.session_state.acertos}\n")
+                st.session_state.tela = 'fim'
+                st.rerun()
 
 # --- TELA 5: FIM ---
 elif st.session_state.tela == 'fim':
@@ -213,6 +210,30 @@ elif st.session_state.tela == 'fim':
     st.metric(label="Sua Nota Final", value=f"{st.session_state.acertos} / 10")
     
     if st.button("Voltar ao Início"):
+        st.session_state.tela = 'inicio'
+        st.session_state.num_questao = 1
+        st.session_state.acertos = 0
+        st.rerun()
+        
+    # --- ÁREA SECRETA DO PROFESSOR ---
+    st.markdown("---")
+    with st.expander("🔐 Área do Professor (Clique para abrir)"):
+        senha = st.text_input("Digite a senha de acesso:", type="password", key="senha_prof")
+        
+        if senha == "juju2025": 
+            st.success("Acesso liberado!")
+            try:
+                with open("resultados.csv", "r", encoding="utf-8") as f:
+                    dados_csv = f.read()
+                
+                st.download_button(
+                    label="📥 Baixar Planilha de Notas (Excel/CSV)",
+                    data=dados_csv,
+                    file_name="notas_dos_alunos.csv",
+                    mime="text/csv"
+                )
+            except FileNotFoundError:
+                st.warning("Nenhum aluno realizou o quiz ainda nesta sessão.")"):
         st.session_state.tela = 'inicio'
         st.session_state.num_questao = 1
         st.session_state.acertos = 0
