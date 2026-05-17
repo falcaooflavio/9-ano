@@ -24,58 +24,115 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- GERADOR DE QUESTÕES ---
+# --- GERADOR DE QUESTÕES EXPANDIDO ---
 def gerar_questao(subtopico):
     quadrados_perfeitos = [(1, "1"), (4, "2"), (9, "3"), (16, "4"), (25, "5"), (36, "6"), (49, "7"), (64, "8"), (81, "9"), (100, "10")]
-    
-    a_pos = random.randint(1, 12)
-    b_pos = random.randint(1, 12)
     v = random.choice(['x', 'y', 'a', 'b'])
-    
-    # 1) PRODUTOS NOTÁVEIS
+    v2 = 'y' if v == 'x' else 'x' # Segunda variável caso necessária
+
+    # 1) PRODUTOS NOTÁVEIS (Mantido estável e limpo)
     if subtopico == "Quadrado da soma":
-        return f"Desenvolva: ({a_pos}{v} + {b_pos})²", f"{a_pos**2}{v}² + {2*a_pos*b_pos}{v} + {b_pos**2}"
+        a = random.randint(1, 10)
+        b = random.randint(1, 10)
+        return f"Desenvolva: ({a}{v} + {b})²", f"{a**2}{v}² + {2*a*b}{v} + {b**2}"
+        
     elif subtopico == "Quadrado da diferença":
-        return f"Desenvolva: ({a_pos}{v} - {b_pos})²", f"{a_pos**2}{v}² - {2*a_pos*b_pos}{v} + {b_pos**2}"
+        a = random.randint(1, 10)
+        b = random.randint(1, 10)
+        return f"Desenvolva: ({a}{v} - {b})²", f"{a**2}{v}² - {2*a*b}{v} + {b**2}"
+        
     elif subtopico == "Produto da soma pela diferença":
-        return f"Desenvolva: ({a_pos}{v} + {b_pos})({a_pos}{v} - {b_pos})", f"{a_pos**2}{v}² - {b_pos**2}"
+        a = random.randint(1, 10)
+        b = random.randint(1, 10)
+        return f"Desenvolva: ({a}{v} + {b})({a}{v} - {b})", f"{a**2}{v}² - {b**2}"
     
-    # 2) FATORAÇÃO
+    # 2) FATORAÇÃO (EXPANDIDA E DIVERSIFICADA)
     elif subtopico == "Fator comum":
-        return f"Fatore: {a_pos}{v}² + {a_pos*b_pos}{v}", f"{a_pos}{v}({v} + {b_pos})"
+        tipo = random.randint(1, 4)
+        if tipo == 1:
+            # Apenas número em evidência: kx² + ky = k(x² + y)
+            k = random.randint(2, 8)
+            return f"Fatore colocando o fator comum em evidência: {k}{v}² + {k*random.randint(2,5)}{v2}", f"{k}({v}² + {int((k*random.randint(2,5))/k)}{v2})"
+        elif tipo == 2:
+            # Número e letra em evidência (Grau 3 e Grau 2)
+            k = random.randint(2, 6)
+            b = random.randint(2, 5)
+            return f"Fatore colocando o fator comum em evidência: {k}{v}³ + {k*b}{v}²", f"{k}{v}²({v} + {b})"
+        elif tipo == 3:
+            # Letras diferentes com número: kxy + kxz = kx(y + z)
+            k = random.randint(2, 7)
+            return f"Fatore colocando o fator comum em evidência: {k}{v}{v2} + {k}{v}z", f"{k}{v}({v2} + z)"
+        else:
+            # Caso padrão solicitado: kx² + km = k(x² + m) -> Ex: 2x² + 4 = 2(x² + 2)
+            k = random.randint(2, 8)
+            b = random.randint(2, 6)
+            return f"Fatore colocando o fator comum em evidência: {k}{v}² + {k*b}", f"{k}({v}² + {b})"
+
     elif subtopico == "Agrupamento":
-        return f"Fatore: x² + {a_pos + b_pos}x + {a_pos * b_pos}", f"(x + {a_pos})(x + {b_pos})"
+        tipo = random.randint(1, 3)
+        a = random.randint(2, 5)
+        b = random.randint(2, 5)
+        if tipo == 1:
+            # Padrão com coeficientes numéricos extras: ax² + abx + cx + cb = (x + b)(ax + c)
+            c = random.randint(2, 5)
+            # ax² + abx + cx + cb
+            pergunta = f"Fatore por agrupamento: {a}{v}² + {a*b}{v} + {c}{v} + {c*b}"
+            resposta = f"({v} + {b})({a}{v} + {c})"
+            return pergunta, resposta
+        elif tipo == 2:
+            # Duas variáveis: xy + ay + bx + ab = (x + a)(y + b)
+            pergunta = f"Fatore por agrupamento: {v}{v2} + {a}{v2} + {b}{v} + {a*b}"
+            resposta = f"({v} + {a})({v2} + {b})"
+            return pergunta, resposta
+        else:
+            # Polinômio com cubos: x³ + ax² + bx + ab = (maximo grau)
+            pergunta = f"Fatore por agrupamento: {v}³ + {a}{v}² + {b}{v} + {a*b}"
+            resposta = f"({v}² + {b})({v} + {a})"
+            return pergunta, resposta
+
     elif subtopico == "Diferença de dois quadrados":
         qp1, raiz1 = random.choice(quadrados_perfeitos)
         qp2, raiz2 = random.choice(quadrados_perfeitos)
         r1_str = "" if raiz1 == "1" else raiz1
         qp1_str = "" if qp1 == 1 else str(qp1)
-        return f"Fatore: {qp1_str}{v}² - {qp2}", f"({r1_str}{v} + {raiz2})({r1_str}{v} - {raiz2})"
+        return f"Fatore a diferença de dois quadrados: {qp1_str}{v}² - {qp2}", f"({r1_str}{v} + {raiz2})({r1_str}{v} - {raiz2})"
+
     elif subtopico == "Trinômio quadrado perfeito":
+        tipo = random.choice([1, 2])
         qp1, raiz1 = random.choice(quadrados_perfeitos)
         qp2, raiz2 = random.choice(quadrados_perfeitos)
-        termo_central = 2 * int(raiz1) * int(raiz2)
-        r1_str = "" if raiz1 == "1" else raiz1
+        r1 = int(raiz1)
+        r2 = int(raiz2)
+        termo_central = 2 * r1 * r2
         qp1_str = "" if qp1 == 1 else str(qp1)
-        return f"Fatore: {qp1_str}{v}² + {termo_central}{v} + {qp2}", f"({r1_str}{v} + {raiz2})²"
+        r1_str = "" if r1 == 1 else str(r1)
+        
+        if tipo == 1:
+            # Trinômio da soma: a²x² + 2abx + b² = (ax + b)²
+            return f"Fatore o trinômio quadrado perfeito: {qp1_str}{v}² + {termo_central}{v} + {qp2}", f"({r1_str}{v} + {r2})²"
+        else:
+            # Trinômio da diferença: a²x² - 2abx + b² = (ax - b)²
+            return f"Fatore o trinômio quadrado perfeito: {qp1_str}{v}² - {termo_central}{v} + {qp2}", f"({r1_str}{v} - {r2})²"
     
     # 3) EQUAÇÕES DO 2º GRAU
     elif subtopico == "ax² = 0":
         a = random.choice([x for x in range(-20, 21) if x != 0])
-        return f"Resolva: {a}x² = 0", "0"
+        return f"Resolva a equação: {a}x² = 0", "0"
+        
     elif subtopico == "ax² + bx = 0":
         a = random.randint(1, 5)
         r2 = random.choice([x for x in range(-10, 11) if x != 0])
         b_calc = -a * r2
-        return f"Resolva: {a}x² {'+' if b_calc >= 0 else '-'} {abs(b_calc)}x = 0", f"0 e {r2}"
+        return f"Resolva a equação: {a}x² {'+' if b_calc >= 0 else '-'} {abs(b_calc)}x = 0", f"0 e {r2}"
+        
     elif subtopico == "ax² + c = 0":
         if random.choice([True, False]):
             raiz_desejada = random.randint(1, 10)
             a_limitado = random.randint(1, 4)
             c_calc = -(raiz_desejada ** 2) * a_limitado
-            return f"Resolva: {a_limitado}x² - {abs(c_calc)} = 0", f"-{raiz_desejada} e {raiz_desejada}"
+            return f"Resolva a equação: {a_limitado}x² - {abs(c_calc)} = 0", f"-{raiz_desejada} e {raiz_desejada}"
         else:
-            return f"Resolva: {random.randint(1, 5)}x² + {random.randint(1, 50)} = 0", "nao possui raiz real"
+            return f"Resolva a equação: {random.randint(1, 5)}x² + {random.randint(1, 50)} = 0", "nao possui raiz real"
             
     return "2 + 2", "4"
 
@@ -149,7 +206,7 @@ elif st.session_state.tela == 'quiz':
     
     resposta_aluno = st.text_input("Sua resposta:", key=f"resp_{st.session_state.num_questao}", disabled=st.session_state.respondido)
     
-    # Bloco de Mensagem de feedback persistente na tela
+    # Renderização do feedback (Sempre aparece antes de avançar)
     if st.session_state.feedback:
         if st.session_state.feedback_tipo == "success":
             st.success(st.session_state.feedback)
@@ -161,17 +218,25 @@ elif st.session_state.tela == 'quiz':
             if resposta_aluno.strip() == "":
                 st.warning("Por favor, digite uma resposta.")
             else:
+                # --- SISTEMA INTELIGENTE DE NORMALIZAÇÃO ---
+                # Remove todos os espaços e padroniza caracteres para ignorar variações de digitação
                 resp_limpa_aluno = resposta_aluno.replace(" ", "").lower().replace("ã", "a").replace("ó", "o")
                 resp_limpa_certa = st.session_state.resposta_certa.replace(" ", "").lower().replace("ã", "a").replace("ó", "o")
                 
                 sucesso = False
+                
+                # Tratamento para Equações de 2º Grau com duas raízes (Aceita qualquer ordem)
                 if "e" in resp_limpa_certa:
                     partes_certas = resp_limpa_certa.split("e")
                     if "e" in resp_limpa_aluno:
                         partes_aluno = resp_limpa_aluno.split("e")
-                        if sorted(partes_certas) == sorted(partes_aluno): sucesso = True
+                        if sorted(partes_certas) == sorted(partes_aluno): 
+                            sucesso = True
                 else:
-                    if resp_limpa_aluno == resp_limpa_certa: sucesso = True
+                    # Tratamento Geral (Fatoração, Produtos Notáveis e raízes únicas)
+                    # Como retiramos os espaços das duas strings, variações como 'x ( x + 2 )' tornam-se iguais a 'x(x+2)'
+                    if resp_limpa_aluno == resp_limpa_certa: 
+                        sucesso = True
 
                 if sucesso:
                     st.session_state.feedback = "Correto! 🎉"
@@ -185,7 +250,7 @@ elif st.session_state.tela == 'quiz':
                 st.rerun()
     else:
         if st.button("Avançar para a Próxima"):
-            st.session_state.feedback = "" # Limpa a mensagem antiga antes de carregar a nova questão
+            st.session_state.feedback = "" 
             if st.session_state.num_questao < 10:
                 st.session_state.num_questao += 1
                 st.session_state.pergunta, st.session_state.resposta_certa = gerar_questao(st.session_state.subtopico)
