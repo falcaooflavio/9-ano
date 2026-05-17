@@ -18,11 +18,13 @@ st.markdown("""
     div.stButton > button:first-child {
         background-color: #2563EB; color: white; font-weight: bold; width: 100%; border-radius: 8px; height: 3em;
     }
-    .titulo { color: #1E3A8A; font-family: 'Helvetica Neue', sans-serif; text-align: center; font-weight: bold; }
+    .titulo { color: #1E3A8A; font-family: 'Helvetica Neue', sans-serif; text-align: center; font-weight: bold; margin-bottom: 5px; }
+    .sub-prof { color: #475569; font-family: 'Helvetica Neue', sans-serif; text-align: center; font-size: 1.2rem; font-weight: 500; margin-bottom: 25px; }
+    .rodape { text-align: center; color: #94A3B8; font-size: 0.85rem; margin-top: 50px; padding-top: 20px; border-top: 1px solid #E2E8F0; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- GERADOR DE QUESTÕES OTIMIZADO ---
+# --- GERADOR DE QUESTÕES ---
 def gerar_questao(subtopico):
     quadrados_perfeitos = [(1, "1"), (4, "2"), (9, "3"), (16, "4"), (25, "5"), (36, "6"), (49, "7"), (64, "8"), (81, "9"), (100, "10")]
     
@@ -85,11 +87,14 @@ if 'tela' not in st.session_state:
     st.session_state.acertos = 0
     st.session_state.num_questao = 1
     st.session_state.respondido = False
+    st.session_state.feedback = ""
+    st.session_state.feedback_tipo = "info"
+    st.session_state.logado_professor = False
 
 # --- TELA 1: IDENTIFICAÇÃO ---
 if st.session_state.tela == 'inicio':
     st.markdown("<h1 class='titulo'>2º BIMESTRE</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align:center; color:#64748B;'>Quiz de Matemática Interativo</p>", unsafe_allow_html=True)
+    st.markdown("<div class='sub-prof'>👨‍🏫 Professor: Flávio Antunes de Almeida</div>", unsafe_allow_html=True)
     
     nome = st.text_input("Nome Completo:")
     turma = st.text_input("Sua Turma (Ex: 9º A):")
@@ -134,6 +139,7 @@ elif st.session_state.tela == 'subtopicos':
             st.session_state.num_questao = 1
             st.session_state.acertos = 0
             st.session_state.respondido = False
+            st.session_state.feedback = ""
             st.rerun()
 
 # --- TELA 4: O QUIZ ---
@@ -143,6 +149,13 @@ elif st.session_state.tela == 'quiz':
     
     resposta_aluno = st.text_input("Sua resposta:", key=f"resp_{st.session_state.num_questao}", disabled=st.session_state.respondido)
     
+    # Bloco de Mensagem de feedback persistente na tela
+    if st.session_state.feedback:
+        if st.session_state.feedback_tipo == "success":
+            st.success(st.session_state.feedback)
+        else:
+            st.error(st.session_state.feedback)
+
     if not st.session_state.respondido:
         if st.button("Enviar Resposta"):
             if resposta_aluno.strip() == "":
@@ -161,15 +174,18 @@ elif st.session_state.tela == 'quiz':
                     if resp_limpa_aluno == resp_limpa_certa: sucesso = True
 
                 if sucesso:
-                    st.success("Correto! 🎉")
+                    st.session_state.feedback = "Correto! 🎉"
+                    st.session_state.feedback_tipo = "success"
                     st.session_state.acertos += 1
                 else:
-                    st.error(f"Errado. A resposta correta era: {st.session_state.resposta_certa}")
+                    st.session_state.feedback = f"Errado. A resposta correta era: {st.session_state.resposta_certa}"
+                    st.session_state.feedback_tipo = "error"
                 
                 st.session_state.respondido = True
                 st.rerun()
     else:
-        if st.button("Avançar"):
+        if st.button("Avançar para a Próxima"):
+            st.session_state.feedback = "" # Limpa a mensagem antiga antes de carregar a nova questão
             if st.session_state.num_questao < 10:
                 st.session_state.num_questao += 1
                 st.session_state.pergunta, st.session_state.resposta_certa = gerar_questao(st.session_state.subtopico)
@@ -198,12 +214,19 @@ elif st.session_state.tela == 'fim':
         st.session_state.acertos = 0
         st.rerun()
 
-# --- ÁREA DO PROFESSOR (Apenas em Memória) ---
+# --- ÁREA DO PROFESSOR (Com Painel de Login) ---
 st.markdown("---")
 with st.expander("🔐 Área de Notas do Professor"):
-    senha = st.text_input("Digite a senha de acesso:", type="password", key="senha_prof")
-    
-    if senha == "juju2025": 
+    if not st.session_state.logado_professor:
+        senha = st.text_input("Digite a senha de acesso:", type="password", key="senha_prof")
+        
+        if st.button("Fazer Login"):
+            if senha == "juju2025":
+                st.session_state.logado_professor = True
+                st.rerun()
+            else:
+                st.error("Senha incorreta. Tente novamente.")
+    else:
         st.success("Acesso liberado!")
         
         if not historico_notas:
@@ -218,3 +241,10 @@ with st.expander("🔐 Área de Notas do Professor"):
                 historico_notas.clear()
                 st.warning("O histórico de notas foi completamente reinicializado!")
                 st.rerun()
+        
+        if st.button("Sair do Painel"):
+            st.session_state.logado_professor = False
+            st.rerun()
+
+# --- RODAPÉ GERAL ---
+st.markdown("<div class='rodape'>Criado por: Flávio Antunes de Almeida</div>", unsafe_allow_html=True)
