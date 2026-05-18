@@ -175,7 +175,7 @@ if 'tela' not in st.session_state:
 
 # --- TELA 1: IDENTIFICAÇÃO ---
 if st.session_state.tela == 'inicio':
-    st.markdown("<h1 class='titulo'>LISTA DE EXERCÍCIOS 2</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 class='titulo'>9 ANO</h1>", unsafe_allow_html=True)
     st.markdown("<div class='sub-prof'>👨‍🏫 Professor: Flávio Antunes de Almeida</div>", unsafe_allow_html=True)
     
     nome = st.text_input("Nome Completo do Estudante:")
