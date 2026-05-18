@@ -7,9 +7,7 @@ st.set_page_config(page_title="Quiz de Matemática - 9º Ano", page_icon="📐",
 
 # --- BANCO DE DADOS EM MEMÓRIA COMPARTILHADA ---
 @st.cache_resource
-def obter_banco_dados():
-    return []
-
+def obter_banco_dados(): return []
 historico_notas = obter_banco_dados()
 
 # --- ESTILIZAÇÃO PERSONALIZADA (CSS) ---
@@ -31,7 +29,7 @@ def limpar_expressao(exp):
     exp = re.sub(r'\b-1([a-zA-Z])', r'-\1', exp)
     return exp.replace("+ -", "- ").replace("- -", "+ ").replace("+ +", "+ ").strip()
 
-# --- GERADOR DE QUESTÕES OTIMIZADO E CONTROLADO ---
+# --- GERADOR DE QUESTÕES INTEGRADO E CONTROLADO ---
 def gerar_questao(subtopico):
     intervalo_20 = [x for x in range(-20, 21) if x != 0]
     quadrados_perfeitos = [(1, 1), (4, 2), (9, 3), (16, 4), (25, 5), (36, 6), (49, 7), (64, 8), (81, 9), (100, 10)]
@@ -61,32 +59,26 @@ def gerar_questao(subtopico):
     elif subtopico == "Fator comum":
         tipo = random.randint(1, 6)
         if tipo == 1:
-            k = random.randint(2, 8)
-            mult = random.randint(2, 5)
-            s = random.choice(['+', '-'])
+            k, mult, s = random.randint(2, 8), random.randint(2, 5), random.choice(['+', '-'])
             return limpar_expressao(f"Fatore colocando o fator comum em evidência: {k}{v}² {s} {k*mult}"), limpar_expressao(f"{k}({v}²{s}{mult})")
         elif tipo == 2:
-            k, mult = random.randint(2, 6), random.randint(2, 5)
-            s = random.choice(['+', '-'])
+            k, mult, s = random.randint(2, 6), random.randint(2, 5), random.choice(['+', '-'])
             return limpar_expressao(f"Fatore colocando o fator comum em evidência: {k*mult}a{v} {s} {k}a"), limpar_expressao(f"{k}a({mult}{v}{s}1)")
         elif tipo == 3:
             k = random.choice(intervalo_20)
             return limpar_expressao(f"Fatore colocando o fator comum em evidência: {k}{v} + {k if k > 0 else abs(k)}{v2}"), limpar_expressao(f"{k}({v}+{v2})")
         elif tipo == 4:
-            k = random.choice(intervalo_20)
-            s = '-' if k > 0 else '+'
+            k, s = random.choice(intervalo_20), '-' if random.choice(intervalo_20) > 0 else '+'
             return limpar_expressao(f"Fatore colocando o fator comum em evidência: {v}³ {s} {abs(k)}{v}²"), limpar_expressao(f"{v}²({v}{s}{abs(k)})")
         elif tipo == 5:
-            k = random.randint(2, 8)
-            return limpar_expressao(f"Fatore colocando o fator comum em evidência: {k*3}{v}²{v2} + {k*2}{v}{v2}²"), limpar_expressao(f"{k}{v}{v2}(3{v}+2{v2})")
+            return limpar_expressao(f"Fatore colocando o fator comum em evidência: {random.randint(2,8)*3}{v}²{v2} + {random.randint(2,8)*2}{v}{v2}²"), limpar_expressao(f"{random.randint(2,8)}{v}{v2}(3{v}+2{v2})")
         else:
             k = random.randint(2, 6)
             return limpar_expressao(f"Fatore colocando o fator comum em evidência: {k*2}{v}⁴ - {k*3}{v}² + {k}{v}"), limpar_expressao(f"{k}{v}(2{v}³-3{v}+1)")
 
     elif subtopico == "Agrupamento":
         tipo = random.randint(1, 3)
-        if tipo == 1:
-            return limpar_expressao(f"Fatore por agrupamento: m{v} + n{v} + m{v2} + n{v2}"), limpar_expressao(f"(m+n)({v}+{v2})")
+        if tipo == 1: return limpar_expressao(f"Fatore por agrupamento: m{v} + n{v} + m{v2} + n{v2}"), limpar_expressao(f"(m+n)({v}+{v2})")
         elif tipo == 2:
             k = random.choice(intervalo_20)
             return limpar_expressao(f"Fatore por agrupamento: {abs(k)}a {'+' if k>0 else '-'} {abs(k)}b + a{v} + b{v}"), limpar_expressao(f"({k}{v})(a+b)" if k < 0 else f"({v}+{k})(a+b)")
@@ -95,29 +87,24 @@ def gerar_questao(subtopico):
             return limpar_expressao(f"Fatore por agrupamento: {v}² {'+' if k>0 else '-'} {abs(k)}{v} + 2{v} {'+' if k>0 else '-'} {2*abs(k)}"), limpar_expressao(f"({v}+2)({v}{'+' if k>0 else '-'}{abs(k)})")
 
     elif subtopico == "Diferença de dois quadrados":
-        qp1, raiz1 = random.choice(quadrados_perfeitos)
-        qp2, raiz2 = random.choice(quadrados_perfeitos)
+        qp1, raiz1 = random.choice(quadrados_perfeitos); qp2, raiz2 = random.choice(quadrados_perfeitos)
         qp1_str, qp2_str = "" if qp1 == 1 else str(qp1), "" if qp2 == 1 else str(qp2)
         r1_str, r2_str = "" if raiz1 == 1 else str(raiz1), "" if raiz2 == 1 else str(raiz2)
         tipo = random.randint(1, 4)
-        if tipo == 1:
-            return limpar_expressao(f"Fatore a diferença de dois quadrados: {qp2} - {qp1_str}{v}²"), limpar_expressao(f"({raiz2}+{r1_str}{v})({raiz2}-{r1_str}{v})")
+        if tipo == 1: return limpar_expressao(f"Fatore a diferença de dois quadrados: {qp2} - {qp1_str}{v}²"), limpar_expressao(f"({raiz2}+{r1_str}{v})({raiz2}-{r1_str}{v})")
         elif tipo == 2:
             var_a, var_b = ('a', 'b') if v not in ['a', 'b'] else ('x', 'y')
-            return limpar_expressao(f"Fatore a diferença de dois quadrados: {qp1_str}{var_a}² - {qp2_str}{var_b}²"), limpar_expressao(f"({"" if raiz1 == 1 else str(raiz1)}{var_a}+{"" if raiz2 == 1 else str(raiz2)}{var_b})({"" if raiz1 == 1 else str(raiz1)}{var_a}-{"" if raiz2 == 1 else str(raiz2)}{var_b})")
-        elif tipo == 3:
-            return limpar_expressao(f"Fatore a diferença de dois quadrados: {v}⁴ - {v}²"), limpar_expressao(f"({v}²+{v})({v}²-{v})")
-        else:
-            return limpar_expressao(f"Fatore a diferença de dois quadrados: {qp1_str}{v}² - {qp2}"), limpar_expressao(f"({r1_str}{v}+{raiz2})({r1_str}{v}-{raiz2})")
+            return limpar_expressao(f"Fatore a diferença de dois quadrados: {qp1_str}{var_a}² - {qp2_str}{var_b}²"), limpar_expressao(f"({r1_str}{var_a}+{r2_str}{var_b})({r1_str}{var_a}-{r2_str}{var_b})")
+        elif tipo == 3: return limpar_expressao(f"Fatore a diferença de dois quadrados: {v}⁴ - {v}²"), limpar_expressao(f"({v}²+{v})({v}²-{v})")
+        else: return limpar_expressao(f"Fatore a diferença de dois quadrados: {qp1_str}{v}² - {qp2}"), limpar_expressao(f"({r1_str}{v}+{raiz2})({r1_str}{v}-{raiz2})")
 
     elif subtopico == "Trinômio quadrado perfeito":
-        qp1, raiz1 = random.choice(quadrados_perfeitos)
-        qp2, raiz2 = random.choice(quadrados_perfeitos)
+        qp1, raiz1 = random.choice(quadrados_perfeitos); qp2, raiz2 = random.choice(quadrados_perfeitos)
         qp1_str, r1_str = "" if qp1 == 1 else str(qp1), "" if raiz1 == 1 else str(raiz1)
         s = random.choice(['+', '-'])
         return limpar_expressao(f"Fatore o trinômio quadrado perfeito: {qp1_str}{v}² {s} {2 * raiz1 * raiz2}{v} + {qp2}"), limpar_expressao(f"({r1_str}{v}{s}{raiz2})²")
 
-    elif subtopico == "Simplificação de fractions":
+    elif subtopico == "Simplificação de frações":
         k, a = random.choice([2, 3, 4, 5]), random.choice([1, 2, 3, 4, 5])
         tipo = random.randint(1, 4)
         if tipo == 1: return rf"Simplifique a fração algébrica: \frac{{{k}{v} - {k*a}}}{{{v}^2 - {a**2}}}", f"{k}/({v}+{a})"
@@ -136,14 +123,13 @@ def gerar_questao(subtopico):
         return limpar_expressao(f"Determine as raízes da equação: {co_a}x² {'+' if b_coef > 0 else '-'} {abs(b_coef)}x = 0"), f"0;{x2}"
 
     elif subtopico == "ax² + c = 0":
-        # 90% de chance de existir raiz real, 10% de não existir
-        if random.random() < 0.90:
-            raiz = random.choice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) # Ampla gama de quadrados perfeitos
+        if random.random() < 0.90:  # 90% de chance de existir raízes reais
+            raiz = random.choice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])  # Sorteia raízes que geram quadrados perfeitos estáveis
             co_a = random.choice([1, 2, 3, 4])
             c_coef = -(co_a * (raiz**2))
             return limpar_expressao(f"Determine as raízes da equação: {co_a}x² - {abs(c_coef)} = 0"), f"{raiz};-{raiz}"
-        else:
-            return limpar_expressao(f"Determine as raízes da equação: {random.randint(1, 10)}x² + {random.randint(1, 50)} = 0"), "não existe"
+        else:  # 10% de chance de NÃO existir raízes reais
+            return limpar_expressao(f"Determine as raízes da equação: {random.randint(1, 5)}x² + {random.randint(10, 80)} = 0"), "não existe"
 
     return "2 + 2", "4"
 
@@ -203,8 +189,10 @@ elif st.session_state.tela == 'quiz':
     else: st.markdown(f"## {st.session_state.pergunta}")
     
     resposta_aluno = st.text_input("Sua resposta:", value="S = { }" if eh_equacao else "", key=f"resp_{st.session_state.num_questao}", disabled=st.session_state.respondido)
+    
     if st.session_state.feedback:
-        st.success(st.session_state.feedback) if st.session_state.feedback_tipo == "success" else st.error(st.session_state.feedback)
+        if st.session_state.feedback_tipo == "success": st.success(st.session_state.feedback)
+        else: st.error(st.session_state.feedback)
 
     if not st.session_state.respondido:
         if st.button("Enviar Resposta"):
