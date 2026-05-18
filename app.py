@@ -28,9 +28,9 @@ st.markdown("""
 def gerar_questao(subtopico):
     quadrados_perfeitos = [(1, "1"), (4, "2"), (9, "3"), (16, "4"), (25, "5"), (36, "6"), (49, "7"), (64, "8"), (81, "9"), (100, "10")]
     v = random.choice(['x', 'y', 'a', 'b'])
-    v2 = 'y' if v == 'x' else 'x' # Segunda variável caso necessária
+    v2 = 'y' if v == 'x' else 'x' # Segunda variável se necessário
 
-    # 1) PRODUTOS NOTÁVEIS (Mantido estável e limpo)
+    # 1) PRODUTOS NOTÁVEIS
     if subtopico == "Quadrado da soma":
         a = random.randint(1, 10)
         b = random.randint(1, 10)
@@ -46,46 +46,70 @@ def gerar_questao(subtopico):
         b = random.randint(1, 10)
         return f"Desenvolva: ({a}{v} + {b})({a}{v} - {b})", f"{a**2}{v}² - {b**2}"
     
-    # 2) FATORAÇÃO (EXPANDIDA E DIVERSIFICADA)
+    # 2) FATORAÇÃO (DIVERSIFICADA COM OS NOVOS EXEMPLOS)
     elif subtopico == "Fator comum":
-        tipo = random.randint(1, 4)
+        tipo = random.randint(1, 5)
+        
         if tipo == 1:
-            # Apenas número em evidência: kx² + ky = k(x² + y)
-            k = random.randint(2, 8)
-            return f"Fatore colocando o fator comum em evidência: {k}{v}² + {k*random.randint(2,5)}{v2}", f"{k}({v}² + {int((k*random.randint(2,5))/k)}{v2})"
+            # Exemplo: 5x + 10 = 5(x + 2)
+            k = random.randint(3, 12)
+            mult = random.randint(2, 5)
+            return f"Fatore colocando o fator comum em evidência: {k}{v} + {k*mult}", f"{k}({v} + {mult})"
+            
         elif tipo == 2:
-            # Número e letra em evidência (Grau 3 e Grau 2)
+            # Exemplo: 10x² + 5x = 5x(2x + 1)
             k = random.randint(2, 6)
-            b = random.randint(2, 5)
-            return f"Fatore colocando o fator comum em evidência: {k}{v}³ + {k*b}{v}²", f"{k}{v}²({v} + {b})"
+            mult = random.randint(2, 4)
+            # Ex: se k=5 e mult=2, gera: 10x² + 5x
+            return f"Fatore colocando o fator comum em evidência: {k*mult}{v}² + {k}{v}", f"{k}{v}({mult}{v} + 1)"
+            
         elif tipo == 3:
+            # Apenas número em evidência com potências: kx² + ky = k(x² + y)
+            k = random.randint(2, 8)
+            mult = random.randint(2, 4)
+            return f"Fatore colocando o fator comum em evidência: {k}{v}² + {k*mult}{v2}", f"{k}({v}² + {mult}{v2})"
+            
+        elif tipo == 4:
             # Letras diferentes com número: kxy + kxz = kx(y + z)
             k = random.randint(2, 7)
             return f"Fatore colocando o fator comum em evidência: {k}{v}{v2} + {k}{v}z", f"{k}{v}({v2} + z)"
+            
         else:
-            # Caso padrão solicitado: kx² + km = k(x² + m) -> Ex: 2x² + 4 = 2(x² + 2)
+            # Exemplo: 2x² + 4 = 2(x² + 2)
             k = random.randint(2, 8)
-            b = random.randint(2, 6)
-            return f"Fatore colocando o fator comum em evidência: {k}{v}² + {k*b}", f"{k}({v}² + {b})"
+            mult = random.randint(2, 5)
+            return f"Fatore colocando o fator comum em evidência: {k}{v}² + {k*mult}", f"{k}({v}² + {mult})"
 
     elif subtopico == "Agrupamento":
-        tipo = random.randint(1, 3)
-        a = random.randint(2, 5)
-        b = random.randint(2, 5)
+        tipo = random.randint(1, 4)
+        
         if tipo == 1:
-            # Padrão com coeficientes numéricos extras: ax² + abx + cx + cb = (x + b)(ax + c)
+            # Exemplo: ax + ay + 5x + 5y = (a + 5)(x + y)
+            k = random.randint(2, 9)
+            # Usando letras explícitas fixas 'a', 'x', 'y' para manter a didática clássica
+            return f"Fatore por agrupamento: a{v} + a{v2} + {k}{v} + {k}{v2}", f"(a + {k})({v} + {v2})"
+            
+        elif tipo == 2:
+            # Coeficientes numéricos em cruz: ax² + abx + cx + cb = (x + b)(ax + c)
+            a = random.randint(2, 4)
+            b = random.randint(2, 4)
             c = random.randint(2, 5)
-            # ax² + abx + cx + cb
             pergunta = f"Fatore por agrupamento: {a}{v}² + {a*b}{v} + {c}{v} + {c*b}"
             resposta = f"({v} + {b})({a}{v} + {c})"
             return pergunta, resposta
-        elif tipo == 2:
-            # Duas variáveis: xy + ay + bx + ab = (x + a)(y + b)
+            
+        elif tipo == 3:
+            # Duas variáveis puras: xy + ay + bx + ab = (x + a)(y + b)
+            a = random.randint(2, 6)
+            b = random.randint(2, 6)
             pergunta = f"Fatore por agrupamento: {v}{v2} + {a}{v2} + {b}{v} + {a*b}"
             resposta = f"({v} + {a})({v2} + {b})"
             return pergunta, resposta
+            
         else:
-            # Polinômio com cubos: x³ + ax² + bx + ab = (maximo grau)
+            # Polinômio cúbico limpo: x³ + ax² + bx + ab = (x² + b)(x + a)
+            a = random.randint(2, 5)
+            b = random.randint(2, 5)
             pergunta = f"Fatore por agrupamento: {v}³ + {a}{v}² + {b}{v} + {a*b}"
             resposta = f"({v}² + {b})({v} + {a})"
             return pergunta, resposta
@@ -108,10 +132,8 @@ def gerar_questao(subtopico):
         r1_str = "" if r1 == 1 else str(r1)
         
         if tipo == 1:
-            # Trinômio da soma: a²x² + 2abx + b² = (ax + b)²
             return f"Fatore o trinômio quadrado perfeito: {qp1_str}{v}² + {termo_central}{v} + {qp2}", f"({r1_str}{v} + {r2})²"
         else:
-            # Trinômio da diferença: a²x² - 2abx + b² = (ax - b)²
             return f"Fatore o trinômio quadrado perfeito: {qp1_str}{v}² - {termo_central}{v} + {qp2}", f"({r1_str}{v} - {r2})²"
     
     # 3) EQUAÇÕES DO 2º GRAU
@@ -206,7 +228,6 @@ elif st.session_state.tela == 'quiz':
     
     resposta_aluno = st.text_input("Sua resposta:", key=f"resp_{st.session_state.num_questao}", disabled=st.session_state.respondido)
     
-    # Renderização do feedback (Sempre aparece antes de avançar)
     if st.session_state.feedback:
         if st.session_state.feedback_tipo == "success":
             st.success(st.session_state.feedback)
@@ -218,25 +239,20 @@ elif st.session_state.tela == 'quiz':
             if resposta_aluno.strip() == "":
                 st.warning("Por favor, digite uma resposta.")
             else:
-                # --- SISTEMA INTELIGENTE DE NORMALIZAÇÃO ---
-                # Remove todos os espaços e padroniza caracteres para ignorar variações de digitação
+                # Normalização completa (ignora maiúsculas, minúsculas, acentos e todos os espaços)
                 resp_limpa_aluno = resposta_aluno.replace(" ", "").lower().replace("ã", "a").replace("ó", "o")
                 resp_limpa_certa = st.session_state.resposta_certa.replace(" ", "").lower().replace("ã", "a").replace("ó", "o")
                 
                 sucesso = False
                 
-                # Tratamento para Equações de 2º Grau com duas raízes (Aceita qualquer ordem)
+                # Raízes em qualquer ordem para Equação do 2º grau
                 if "e" in resp_limpa_certa:
                     partes_certas = resp_limpa_certa.split("e")
                     if "e" in resp_limpa_aluno:
                         partes_aluno = resp_limpa_aluno.split("e")
-                        if sorted(partes_certas) == sorted(partes_aluno): 
-                            sucesso = True
+                        if sorted(partes_certas) == sorted(partes_aluno): sucesso = True
                 else:
-                    # Tratamento Geral (Fatoração, Produtos Notáveis e raízes únicas)
-                    # Como retiramos os espaços das duas strings, variações como 'x ( x + 2 )' tornam-se iguais a 'x(x+2)'
-                    if resp_limpa_aluno == resp_limpa_certa: 
-                        sucesso = True
+                    if resp_limpa_aluno == resp_limpa_certa: sucesso = True
 
                 if sucesso:
                     st.session_state.feedback = "Correto! 🎉"
@@ -279,7 +295,7 @@ elif st.session_state.tela == 'fim':
         st.session_state.acertos = 0
         st.rerun()
 
-# --- ÁREA DO PROFESSOR (Com Painel de Login) ---
+# --- ÁREA DO PROFESSOR ---
 st.markdown("---")
 with st.expander("🔐 Área de Notas do Professor"):
     if not st.session_state.logado_professor:
