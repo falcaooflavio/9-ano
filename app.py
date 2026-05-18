@@ -396,3 +396,37 @@ elif st.session_state.tela == 'fim':
         st.session_state.acertos = 0
         st.rerun()
 
+# --- ÁREA DO PROFESSOR ---
+st.markdown("---")
+with st.expander("🔐 Painel de Notas do Professor"):
+    if not st.session_state.logado_professor:
+        senha = st.text_input("Digite a senha de acesso:", type="password", key="senha_prof")
+        
+        if st.button("Acessar Notas"):
+            if senha == "juju2025":
+                st.session_state.logado_professor = True
+                st.rerun()
+            else:
+                st.error("Senha incorreta. Tente novamente.")
+    else:
+        st.success("Acesso liberado!")
+        
+        if not historico_notas:
+            st.info("Nenhum aluno realizou o treino até o momento.")
+        else:
+            st.markdown("### 📊 Relatório Estatístico")
+            notas_ordenadas = sorted(historico_notas, key=lambda x: x["Nota (Acertos)"], reverse=True)
+            st.table(notas_ordenadas)
+            
+            st.markdown("---")
+            if st.button("🚨 LIMPAR HISTÓRICO DE NOTAS DEFINITIVAMENTE"):
+                historico_notas.clear()
+                st.warning("O histórico de notas foi resetado!")
+                st.rerun()
+        
+        if st.button("Fechar Painel"):
+            st.session_state.logado_professor = False
+            st.rerun()
+
+# --- RODAPÉ GERAL ---
+st.markdown("<div class='rodape'>Criado por: Flávio Antunes de Almeida</div>", unsafe_allow_html=True)
