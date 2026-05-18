@@ -24,7 +24,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- GERADOR DE QUESTÕES ALINHADO COM A LISTA 2 ---
+# --- GERADOR DE QUESTÕES ALINHADO COM AS ADAPTAÇÕES ---
 def gerar_questao(subtopico):
     # Intervalo amplo solicitado (-20 a 20, exceto 0)
     intervalo_amplo = [x for x in range(-20, 21) if x != 0]
@@ -35,25 +35,43 @@ def gerar_questao(subtopico):
     v = random.choice(['x', 'y', 'a', 'b', 'm', 'n'])
     v2 = 'y' if v == 'x' else 'x' if v != 'y' else 'b'
 
-    # 1) FATOR COMUM EM EVIDÊNCIA
+    # 1) FATOR COMUM EM EVIDÊNCIA (TODOS OS CASOS POSSÍVEIS)
     if subtopico == "Fator comum":
-        tipo = random.randint(1, 4)
+        tipo = random.randint(1, 6)
+        
         if tipo == 1:
-            # Formato: kx + ky = k(x + y)
+            # Caso: 2x² - 4 = 2(x² - 2)
+            k = random.randint(2, 8)
+            mult = random.randint(2, 5)
+            sinal = random.choice(['+', '-'])
+            return f"Fatore colocando o fator comum em evidência: {k}{v}² {sinal} {k*mult}", f"{k}({v}²{sinal}{mult})"
+            
+        elif tipo == 2:
+            # Caso: 15ax + 3a = 3a(5x + 1)
+            k = random.randint(2, 6)
+            mult = random.randint(2, 5)
+            sinal = random.choice(['+', '-'])
+            return f"Fatore colocando o fator comum em evidência: {k*mult}a{v} {sinal} {k}a", f"{k}a({mult}{v}{sinal}1)"
+            
+        elif tipo == 3:
+            # Caso: kx + ky = k(x + y)
             k = random.choice(intervalo_amplo)
             sinal = '+' if k > 0 else ''
             return f"Fatore colocando o fator comum em evidência: {k}{v} + {k if k > 0 else abs(k)}{v2}", f"{k}({v}+{v2})"
-        elif tipo == 2:
-            # Formato: x³ - kx² = x²(x - k)
+            
+        elif tipo == 4:
+            # Caso: x³ - kx² = x²(x - k)
             k = random.choice(intervalo_amplo)
             sinal = '-' if k > 0 else '+'
             return f"Fatore colocando o fator comum em evidência: {v}³ {sinal} {abs(k)}{v}²", f"{v}²({v}{sinal}{abs(k)})"
-        elif tipo == 3:
-            # Formato com número e letras em evidência (ex: 18a²b + 12ab²)
+            
+        elif tipo == 5:
+            # Caso com duas variáveis: 18a²b + 12ab² = 6ab(3a + 2b)
             k = random.randint(2, 8)
             return f"Fatore colocando o fator comum em evidência: {k*3}{v}²{v2} + {k*2}{v}{v2}²", f"{k}{v}{v2}(3{v}+2{v2})"
+            
         else:
-            # Formato trinômio: ky⁴ - k_mult*y² + k*y
+            # Caso trinômio: ky⁴ - k_mult*y² + k*y
             k = random.randint(2, 6)
             return f"Fatore colocando o fator comum em evidência: {k*2}{v}⁴ - {k*3}{v}² + {k}{v}", f"{k}{v}(2{v}³-3{v}+1)"
 
@@ -61,26 +79,44 @@ def gerar_questao(subtopico):
     elif subtopico == "Agrupamento":
         tipo = random.randint(1, 3)
         if tipo == 1:
-            # Formato clássico: mx + nx + my + ny = (m + n)(x + y)
             return f"Fatore por agrupamento: m{v} + n{v} + m{v2} + n{v2}", f"(m+n)({v}+{v2})"
         elif tipo == 2:
-            # Formato numérico cruzado: ka + kb + ax + bx = (k + x)(a + b)
             k = random.choice(intervalo_amplo)
-            sinal = '+' if k > 0 else '-'
             return f"Fatore por agrupamento: {abs(k)}a {'+' if k>0 else '-'} {abs(k)}b + a{v} + b{v}", f"({k}{v})(a+b)" if k < 0 else f"({v}+{k})(a+b)"
         else:
-            # Formato quadrático: x² + kx + 2x + 2k = (x + 2)(x + k)
             k = random.choice(intervalo_amplo)
             sinal = '+' if k > 0 else '-'
             return f"Fatore por agrupamento: {v}² {'+' if k>0 else '-'} {abs(k)}{v} + 2{v} {'+' if k>0 else '-'} {2*abs(k)}", f"({v}+2)({v}{sinal}{abs(k)})"
 
-    # 3) DIFERENÇA DE DOIS QUADRADOS
+    # 3) DIFERENÇA DE DOIS QUADRADOS (ORDEM INVERSA, DUAS VARIÁVEIS E QUARTA ORDEM)
     elif subtopico == "Diferença de dois quadrados":
+        tipo_dq = random.randint(1, 4)
         qp1, raiz1 = random.choice(quadrados_perfeitos)
         qp2, raiz2 = random.choice(quadrados_perfeitos)
+        
         qp1_str = "" if qp1 == 1 else str(qp1)
+        qp2_str = "" if qp2 == 1 else str(qp2)
         r1_str = "" if raiz1 == 1 else str(raiz1)
-        return f"Fatore a diferença de dois quadrados: {qp1_str}{v}² - {qp2}", f"({r1_str}{v}+{raiz2})({r1_str}{v}-{raiz2})"
+        r2_str = "" if raiz2 == 1 else str(raiz2)
+        
+        if tipo_dq == 1:
+            # Ordem inversa clássica: B - Ax² (Ex: 1 - x²)
+            return f"Fatore a diferença de dois quadrados: {qp2} - {qp1_str}{v}²", f"({raiz2}+{r1_str}{v})({raiz2}-{r1_str}{v})"
+            
+        elif tipo_dq == 2:
+            # Duas variáveis elevadas ao quadrado (Ex: 4a² - 9b²)
+            var_a, var_b = ('a', 'b') if v not in ['a', 'b'] else ('x', 'y')
+            r_a = "" if raiz1 == 1 else str(raiz1)
+            r_b = "" if raiz2 == 1 else str(raiz2)
+            return f"Fatore a diferença de dois quadrados: {qp1_str}{var_a}² - {qp2_str}{var_b}²", f"({r_a}{var_a}+{r_b}{var_b})({r_a}{var_a}-{r_b}{var_b})"
+            
+        elif tipo_dq == 3:
+            # Potências de quarta ordem pura (Ex: y⁴ - y²)
+            return f"Fatore a diferença de dois quadrados: {v}⁴ - {v}²", f"({v}²+{v})({v}²-{v})"
+            
+        else:
+            # Padrão direto: Ax² - B
+            return f"Fatore a diferença de dois quadrados: {qp1_str}{v}² - {qp2}", f"({r1_str}{v}+{raiz2})({r1_str}{v}-{raiz2})"
 
     # 4) TRINÔMIO QUADRADO PERFEITO
     elif subtopico == "Trinômio quadrado perfeito":
@@ -99,15 +135,12 @@ def gerar_questao(subtopico):
     elif subtopico == "Simplificação de frações":
         tipo = random.randint(1, 3)
         if tipo == 1:
-            # Formato: (kx - k) / (x² - 1) = k / (x + 1)
             k = random.choice(intervalo_amplo)
             return f"Simplifique a fração algébrica: \\\\frac{{{k}{v} - {k}}}{{{v}² - 1}}", f"{k}/({v}+1)"
         elif tipo == 2:
-            # Formato: (x² + 2kx + k²) / (x + k) = x + k
             _, k = random.choice(quadrados_perfeitos)
             return f"Simplifique a fração algébrica: \\\\frac{{{v}² + {2*k}{v} + {k**2}}}{{{v} + {k}}}", f"{v}+{k}"
         else:
-            # Formato: (v² - k²) / (v² + 2kv + k²) = (v - k) / (v + k)
             _, k = random.choice(quadrados_perfeitos)
             return f"Simplifique a fração algébrica: \\\\frac{{{v}² - {k**2}}}{{{v}² + {2*k}{v} + {k**2}}}", f"({v}-{k})/({v}+{k})"
 
@@ -128,12 +161,12 @@ if 'tela' not in st.session_state:
 # --- TELA 1: IDENTIFICAÇÃO ---
 if st.session_state.tela == 'inicio':
     st.markdown("<h1 class='titulo'>LISTA DE EXERCÍCIOS 2</h1>", unsafe_allow_html=True)
-    st.markdown("<div class='sub-prof'>🏫 E. M. Professora Josiany França<br>👨‍🏫 Professor: Flávio Antunes de Almeida</div>", unsafe_allow_html=True)
+    st.markdown("<div class='sub-prof'>👨‍🏫 Professor: Flávio Antunes de Almeida</div>", unsafe_allow_html=True)
     
     nome = st.text_input("Nome Completo do Estudante:")
     turma = st.text_input("Sua Turma (Ex: 9º A):")
     
-    if st.button("INICIAR QUIZ (5 PONTOS)"):
+    if st.button("INICIAR QUIZ"):
         if nome and turma:
             st.session_state.nome = nome
             st.session_state.turma = turma
@@ -169,7 +202,6 @@ elif st.session_state.tela == 'subtopicos':
 elif st.session_state.tela == 'quiz':
     st.write(f"**Questão {st.session_state.num_questao} de 10** — *{st.session_state.subtopico}*")
     
-    # Se for fração, renderiza em LaTeX para ficar visualmente idêntico à lista
     if "frac" in st.session_state.pergunta:
         st.markdown(f"### {st.session_state.pergunta.split(':')[0]}:")
         st.latex(st.session_state.pergunta.split(':')[1].strip())
@@ -189,13 +221,12 @@ elif st.session_state.tela == 'quiz':
             if resposta_aluno.strip() == "":
                 st.warning("Por favor, digite uma resposta.")
             else:
-                # Normalização estrita de polinômios e strings
                 resp_limpa_aluno = resposta_aluno.replace(" ", "").lower().replace("–", "-")
                 resp_limpa_certa = st.session_state.resposta_certa.replace(" ", "").lower()
                 
                 sucesso = False
                 
-                # Tratamento para checar produtos notáveis equivalentes trocados de ordem (ex: (x+y)(x-y) ou (x-y)(x+y))
+                # Permite ordens trocadas de fatores ex: (a+b)(a-b) ou (a-b)(a+b)
                 if ")(" in resp_limpa_certa:
                     partes_certas = resp_limpa_certa.strip("()").split(")(")
                     if ")(" in resp_limpa_aluno:
@@ -263,7 +294,7 @@ with st.expander("🔐 Painel de Notas do Professor"):
         if not historico_notas:
             st.info("Nenhum aluno realizou o treino até o momento.")
         else:
-            st.markdown("### 📊 Relatório Estatístico da Lista")
+            st.markdown("### 📊 Relatório Estatístico")
             notas_ordenadas = sorted(historico_notas, key=lambda x: x["Nota (Acertos)"], reverse=True)
             st.table(notas_ordenadas)
             
@@ -278,4 +309,4 @@ with st.expander("🔐 Painel de Notas do Professor"):
             st.rerun()
 
 # --- RODAPÉ GERAL ---
-st.markdown("<div class='rodape'>Criado por: Flávio Antunes de Almeida<br><i>'O gênio é 1% inspiração e 99% transpiração.' - Thomas Edison</i></div>", unsafe_allow_html=True)
+st.markdown("<div class='rodape'>Criado por: Flávio Antunes de Almeida</div>", unsafe_allow_html=True)
