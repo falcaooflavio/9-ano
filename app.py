@@ -131,18 +131,18 @@ def gerar_questao(subtopico):
         else:
             return f"Fatore o trinômio quadrado perfeito: {qp1_str}{v}² - {termo_central}{v} + {qp2}", f"({r1_str}{v}-{raiz2})²"
 
-    # 5) SIMPLIFICAÇÃO DE FRAÇÕES ALGÉBRICAS
+    # 5) SIMPLIFICAÇÃO DE FRAÇÕES ALGÉBRICAS (CORRIGIDO)
     elif subtopico == "Simplificação de frações":
         tipo = random.randint(1, 3)
         if tipo == 1:
             k = random.choice(intervalo_amplo)
-            return f"Simplifique a fração algébrica: \\\\frac{{{k}{v} - {k}}}{{{v}² - 1}}", f"{k}/({v}+1)"
+            return rf"Simplifique a fração algébrica: \frac{{{k}{v} - {k}}}{{{v}^2 - 1}}", f"{k}/({v}+1)"
         elif tipo == 2:
             _, k = random.choice(quadrados_perfeitos)
-            return f"Simplifique a fração algébrica: \\\\frac{{{v}² + {2*k}{v} + {k**2}}}{{{v} + {k}}}", f"{v}+{k}"
+            return rf"Simplifique a fração algébrica: \frac{{{v}^2 + {2*k}{v} + {k**2}}}{{{v} + {k}}}", f"{v}+{k}"
         else:
             _, k = random.choice(quadrados_perfeitos)
-            return f"Simplifique a fração algébrica: \\\\frac{{{v}² - {k**2}}}{{{v}² + {2*k}{v} + {k**2}}}", f"({v}-{k})/({v}+{k})"
+            return rf"Simplifique a fração algébrica: \frac{{{v}^2 - {k**2}}}{{{v}^2 + {2*k}{v} + {k**2}}}", f"({v}-{k})/({v}+{k})"
 
     return "2 + 2", "4"
 
@@ -202,9 +202,14 @@ elif st.session_state.tela == 'subtopicos':
 elif st.session_state.tela == 'quiz':
     st.write(f"**Questão {st.session_state.num_questao} de 10** — *{st.session_state.subtopico}*")
     
+    # Renderização correta da fração em LaTeX
     if "frac" in st.session_state.pergunta:
-        st.markdown(f"### {st.session_state.pergunta.split(':')[0]}:")
-        st.latex(st.session_state.pergunta.split(':')[1].strip())
+        partes = st.session_state.pergunta.split(":")
+        enunciado = partes[0] + ":"
+        expressao_latex = partes[1].strip()
+        
+        st.markdown(f"## {enunciado}")
+        st.latex(expressao_latex)
     else:
         st.markdown(f"## {st.session_state.pergunta}")
     
