@@ -25,17 +25,17 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- FUNÇÃO AUXILIAR PARA CORRIGIR COEFICIENTES 1 E -1 ---
+# --- FUNÇÃO CORRIGIDA PARA LIMPAR COEFICIENTES 1 E -1 (SEM LOOK-BEHIND VARIÁVEL) ---
 def limpar_expressao(exp):
-    # Remove coeficientes 1 positivos no início ou após sinais (+ ou -)
-    exp = re.sub(r'(?<=^|[\+\-\s])1([a-zA-Z])', r'\1', exp)
-    # Trata o caso do -1 virando apenas -
-    exp = re.sub(r'(?<=^|[\+\-\s])\-1([a-zA-Z])', r'-\1', exp)
-    # Remove espaços extras indesejados que possam surgir
-    exp = exp.replace("  ", " ").strip()
-    return exp
+    # Substitui 1 seguido de letra por apenas a letra (no início ou após sinais)
+    exp = re.sub(r'\b1([a-zA-Z])', r'\1', exp)
+    # Substitui -1 seguido de letra por - e a letra
+    exp = re.sub(r'\b-1([a-zA-Z])', r'-\1', exp)
+    # Correções adicionais de sinais duplicados que possam surgir na montagem de strings
+    exp = exp.replace("+ -", "- ").replace("- -", "+ ").replace("+ +", "+ ")
+    return exp.strip()
 
-# --- GERADOR DE QUESTÕES AMPLIADO ---
+# --- GERADOR DE QUESTÕES COMPLETAMENTE INTEGRADO ---
 def gerar_questao(subtopico):
     intervalo_20 = [x for x in range(-20, 21) if x != 0]
     quadrados_perfeitos = [(1, 1), (4, 2), (9, 3), (16, 4), (25, 5), (36, 6), (49, 7), (64, 8), (81, 9), (100, 10)]
@@ -297,7 +297,7 @@ elif st.session_state.tela == 'quiz':
     if eh_equacao:
         st.info("💡 Insira a resposta dentro das chaves separando as raízes por ponto e vírgula. Se não houver raízes reais, apague tudo dentro das chaves e digite: não existe")
 
-    # Renderização correta da fração em LaTeX
+    # Renderização da fração em LaTeX
     if "frac" in st.session_state.pergunta:
         partes = st.session_state.pergunta.split(":")
         enunciado = partes[0] + ":"
@@ -308,7 +308,7 @@ elif st.session_state.tela == 'quiz':
     else:
         st.markdown(f"## {st.session_state.pergunta}")
     
-    # Campo pré-escrito para equações ou campo limpo para produtos/fatoração
+    # Campo com S = { } para equações ou limpo para os outros
     valor_padrao = "S = { }" if eh_equacao else ""
     resposta_aluno = st.text_input("Sua resposta:", value=valor_padrao, key=f"resp_{st.session_state.num_questao}", disabled=st.session_state.respondido)
     
@@ -326,25 +326,24 @@ elif st.session_state.tela == 'quiz':
                 resp_limpa_aluno = resposta_aluno.replace(" ", "").lower().replace("–", "-")
                 resp_limpa_certa = st.session_state.resposta_certa.replace(" ", "").lower()
                 
-                # Se for equação, extrai o conteúdo de dentro de S={} para verificar as raízes
+                # Captura o valor de dentro de S={...} se for equação
                 if eh_equacao:
                     match_aluno = re.search(r's=\{(.*?)\}', resp_limpa_aluno)
                     if match_aluno:
                         resp_limpa_aluno = match_aluno.group(1)
                     else:
-                        # Se o aluno deletou o S={} e digitou diretamente "não existe"
                         resp_limpa_aluno = resp_limpa_aluno.replace("s={", "").replace("}", "")
 
                 sucesso = False
                 
-                # Validação para duas raízes separadas por ";" (Permite inversão)
+                # Validação para duas raízes com ordem livre (usando ";")
                 if ";" in resp_limpa_certa:
                     partes_certas = resp_limpa_certa.split(";")
                     if ";" in resp_limpa_aluno:
                         partes_aluno = resp_limpa_aluno.split(";")
                         if sorted(partes_certas) == sorted(partes_aluno): 
                             sucesso = True
-                # Validação para ordens trocadas de fatores algébricos ex: (a+b)(a-b)
+                # Validação para fatores em ordem trocada ex: (a+b)(a-b)
                 elif ")(" in resp_limpa_certa:
                     partes_certas = resp_limpa_certa.strip("()").split(")(")
                     if ")(" in resp_limpa_aluno:
@@ -397,37 +396,3 @@ elif st.session_state.tela == 'fim':
         st.session_state.acertos = 0
         st.rerun()
 
-# ---# --- ÁREA DO PROFESSOR ---
-st.markdown("---")
-with st.expander("🔐 Painel de Notas do Professor"):
-    if not st.session_state.logado_professor:
-        senha = st.text_input("Digite a senha de acesso:", type="password", key="senha_prof")
-        
-        if st.button("Acessar Notas"):
-            if senha == "juju2025":
-                st.session_state.logado_professor = True
-                st.rerun()
-            else:
-                st.error("Senha incorreta. Tente novamente.")
-    else:
-        st.success("Acesso liberado!")
-        
-        if not historico_notas:
-            st.info("Nenhum aluno realizou o treino até o momento.")
-        else:
-            st.markdown("### 📊 Relatório Estatístico")
-            notas_ordenadas = sorted(historico_notas, key=lambda x: x["Nota (Acertos)"], reverse=True)
-            st.table(notas_ordenadas)
-            
-            st.markdown("---")
-            if st.button("🚨 LIMPAR HISTÓRICO DE NOTAS DEFINITIVAMENTE"):
-                historico_notas.clear()
-                st.warning("O histórico de notas foi resetado!")
-                st.rerun()
-        
-        if st.button("Fechar Painel"):
-            st.session_state.logado_professor = False
-            st.rerun()
-
-# --- RODAPÉ GERAL ---
-st.markdown("<div class='rodape'>Criado por: Flávio Antunes de Almeida</div>", unsafe_allow_html=True) 
