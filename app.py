@@ -25,83 +25,36 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- FUNÇÃO CORRIGIDA PARA LIMPAR COEFICIENTES 1 E -1 (SEM LOOK-BEHIND VARIÁVEL) ---
+# --- FUNÇÃO AUXILIAR PARA CORRIGIR COEFICIENTES 1 E -1 ---
 def limpar_expressao(exp):
-    # Substitui 1 seguido de letra por apenas a letra (no início ou após sinais)
     exp = re.sub(r'\b1([a-zA-Z])', r'\1', exp)
-    # Substitui -1 seguido de letra por - e a letra
     exp = re.sub(r'\b-1([a-zA-Z])', r'-\1', exp)
-    # Correções adicionais de sinais duplicados que possam surgir na montagem de strings
-    exp = exp.replace("+ -", "- ").replace("- -", "+ ").replace("+ +", "+ ")
-    return exp.strip()
+    return exp.replace("+ -", "- ").replace("- -", "+ ").replace("+ +", "+ ").strip()
 
-# --- GERADOR DE QUESTÕES COMPLETAMENTE INTEGRADO ---
+# --- GERADOR DE QUESTÕES OTIMIZADO E CONTROLADO ---
 def gerar_questao(subtopico):
     intervalo_20 = [x for x in range(-20, 21) if x != 0]
     quadrados_perfeitos = [(1, 1), (4, 2), (9, 3), (16, 4), (25, 5), (36, 6), (49, 7), (64, 8), (81, 9), (100, 10)]
     
     v = random.choice(['x', 'y', 'a', 'b', 'm', 'n'])
     v2 = 'y' if v == 'x' else 'x' if v != 'y' else 'b'
+    a, b = abs(random.choice([1, 2, 3, 4, 5])), abs(random.choice([1, 2, 3, 4, 5]))
+    t1_vars = {1: f"{a if a != 1 else ''}{v}", 2: f"{a if a != 1 else ''}{v}", 3: f"{a if a != 1 else ''}{v}²"}
+    t2_vars = {1: f"{b}", 2: f"{b if b != 1 else ''}{v2}", 3: f"{b if b != 1 else ''}{v}"}
 
     # --- PRODUTOS NOTÁVEIS ---
-    if subtopico == "Quadrado da soma de 2 termos":
+    if subtopico in ["Quadrado da soma de 2 termos", "Quadrado da diferença de 2 termos", "Produto da soma pela diferença"]:
         tipo = random.randint(1, 3)
-        a = abs(random.choice([1, 2, 3, 4, 5]))
-        b = abs(random.choice([1, 2, 3, 4, 5]))
+        t1, t2 = t1_vars[tipo], t2_vars[tipo]
         
-        if tipo == 1:
-            t1 = f"{a if a != 1 else ''}{v}"
-            resp = f"{a**2}{v}²+{2*a*b}{v}+{b**2}"
-            return limpar_expressao(f"Desenvolva o produto notável: ({t1} + {b})²"), limpar_expressao(resp)
-        elif tipo == 2:
-            t1 = f"{a if a != 1 else ''}{v}"
-            t2 = f"{b if b != 1 else ''}{v2}"
-            resp = f"{a**2}{v}²+{2*a*b}{v}{v2}+{b**2}{v2}²"
+        if subtopico == "Quadrado da soma de 2 termos":
+            resp = f"{a**2}{v}⁴+{2*a*b}{v}³+{b**2}{v}²" if tipo == 3 else f"{a**2}{v}²+{2*a*b}{v}{v2 if tipo==2 else ''}+{b**2}{v2 if tipo==2 else ''}²".replace("²²","²")
             return limpar_expressao(f"Desenvolva o produto notável: ({t1} + {t2})²"), limpar_expressao(resp)
-        else:
-            t1 = f"{a if a != 1 else ''}{v}²"
-            t2 = f"{b if b != 1 else ''}{v}"
-            resp = f"{a**2}{v}⁴+{2*a*b}{v}³+{b**2}{v}²"
-            return limpar_expressao(f"Desenvolva o produto notável: ({t1} + {t2})²"), limpar_expressao(resp)
-
-    elif subtopico == "Quadrado da diferença de 2 termos":
-        tipo = random.randint(1, 3)
-        a = abs(random.choice([1, 2, 3, 4, 5]))
-        b = abs(random.choice([1, 2, 3, 4, 5]))
-        
-        if tipo == 1:
-            t1 = f"{a if a != 1 else ''}{v}"
-            resp = f"{a**2}{v}²-{2*a*b}{v}+{b**2}"
-            return limpar_expressao(f"Desenvolva o produto notável: ({t1} - {b})²"), limpar_expressao(resp)
-        elif tipo == 2:
-            t1 = f"{a if a != 1 else ''}{v}"
-            t2 = f"{b if b != 1 else ''}{v2}"
-            resp = f"{a**2}{v}²-{2*a*b}{v}{v2}+{b**2}{v2}²"
+        elif subtopico == "Quadrado da diferença de 2 termos":
+            resp = f"{a**2}{v}⁴-{2*a*b}{v}³+{b**2}{v}²" if tipo == 3 else f"{a**2}{v}²-{2*a*b}{v}{v2 if tipo==2 else ''}+{b**2}{v2 if tipo==2 else ''}²".replace("²²","²")
             return limpar_expressao(f"Desenvolva o produto notável: ({t1} - {t2})²"), limpar_expressao(resp)
         else:
-            t1 = f"{a if a != 1 else ''}{v}²"
-            t2 = f"{b if b != 1 else ''}{v}"
-            resp = f"{a**2}{v}⁴-{2*a*b}{v}³+{b**2}{v}²"
-            return limpar_expressao(f"Desenvolva o produto notável: ({t1} - {t2})²"), limpar_expressao(resp)
-
-    elif subtopico == "Produto da soma pela diferença":
-        tipo = random.randint(1, 3)
-        a = abs(random.choice([1, 2, 3, 4, 5]))
-        b = abs(random.choice([1, 2, 3, 4, 5]))
-        
-        if tipo == 1:
-            t1 = f"{a if a != 1 else ''}{v}"
-            resp = f"{a**2}{v}²-{b**2}"
-            return limpar_expressao(f"Desenvolva o produto notável: ({t1} + {b})({t1} - {b})"), limpar_expressao(resp)
-        elif tipo == 2:
-            t1 = f"{a if a != 1 else ''}{v}"
-            t2 = f"{b if b != 1 else ''}{v2}"
-            resp = f"{a**2}{v}²-{b**2}{v2}²"
-            return limpar_expressao(f"Desenvolva o produto notável: ({t1} + {t2})({t1} - {t2})"), limpar_expressao(resp)
-        else:
-            t1 = f"{a if a != 1 else ''}{v}²"
-            t2 = f"{b if b != 1 else ''}{v}"
-            resp = f"{a**2}{v}⁴-{b**2}{v}²"
+            resp = f"{a**2}{v}⁴-{b**2}{v}²" if tipo == 3 else f"{a**2}{v}²-{b**2}{v2 if tipo==2 else ''}²".replace("²²","²")
             return limpar_expressao(f"Desenvolva o produto notável: ({t1} + {t2})({t1} - {t2})"), limpar_expressao(resp)
 
     # --- FATORAÇÃO ---
@@ -110,20 +63,19 @@ def gerar_questao(subtopico):
         if tipo == 1:
             k = random.randint(2, 8)
             mult = random.randint(2, 5)
-            sinal = random.choice(['+', '-'])
-            return limpar_expressao(f"Fatore colocando o fator comum em evidência: {k}{v}² {sinal} {k*mult}"), limpar_expressao(f"{k}({v}²{sinal}{mult})")
+            s = random.choice(['+', '-'])
+            return limpar_expressao(f"Fatore colocando o fator comum em evidência: {k}{v}² {s} {k*mult}"), limpar_expressao(f"{k}({v}²{s}{mult})")
         elif tipo == 2:
-            k = random.randint(2, 6)
-            mult = random.randint(2, 5)
-            sinal = random.choice(['+', '-'])
-            return limpar_expressao(f"Fatore colocando o fator comum em evidência: {k*mult}a{v} {sinal} {k}a"), limpar_expressao(f"{k}a({mult}{v}{sinal}1)")
+            k, mult = random.randint(2, 6), random.randint(2, 5)
+            s = random.choice(['+', '-'])
+            return limpar_expressao(f"Fatore colocando o fator comum em evidência: {k*mult}a{v} {s} {k}a"), limpar_expressao(f"{k}a({mult}{v}{s}1)")
         elif tipo == 3:
             k = random.choice(intervalo_20)
             return limpar_expressao(f"Fatore colocando o fator comum em evidência: {k}{v} + {k if k > 0 else abs(k)}{v2}"), limpar_expressao(f"{k}({v}+{v2})")
         elif tipo == 4:
             k = random.choice(intervalo_20)
-            sinal = '-' if k > 0 else '+'
-            return limpar_expressao(f"Fatore colocando o fator comum em evidência: {v}³ {sinal} {abs(k)}{v}²"), limpar_expressao(f"{v}²({v}{sinal}{abs(k)})")
+            s = '-' if k > 0 else '+'
+            return limpar_expressao(f"Fatore colocando o fator comum em evidência: {v}³ {s} {abs(k)}{v}²"), limpar_expressao(f"{v}²({v}{s}{abs(k)})")
         elif tipo == 5:
             k = random.randint(2, 8)
             return limpar_expressao(f"Fatore colocando o fator comum em evidência: {k*3}{v}²{v2} + {k*2}{v}{v2}²"), limpar_expressao(f"{k}{v}{v2}(3{v}+2{v2})")
@@ -140,24 +92,20 @@ def gerar_questao(subtopico):
             return limpar_expressao(f"Fatore por agrupamento: {abs(k)}a {'+' if k>0 else '-'} {abs(k)}b + a{v} + b{v}"), limpar_expressao(f"({k}{v})(a+b)" if k < 0 else f"({v}+{k})(a+b)")
         else:
             k = random.choice(intervalo_20)
-            sinal = '+' if k > 0 else '-'
-            return limpar_expressao(f"Fatore por agrupamento: {v}² {'+' if k>0 else '-'} {abs(k)}{v} + 2{v} {'+' if k>0 else '-'} {2*abs(k)}"), limpar_expressao(f"({v}+2)({v}{sinal}{abs(k)})")
+            return limpar_expressao(f"Fatore por agrupamento: {v}² {'+' if k>0 else '-'} {abs(k)}{v} + 2{v} {'+' if k>0 else '-'} {2*abs(k)}"), limpar_expressao(f"({v}+2)({v}{'+' if k>0 else '-'}{abs(k)})")
 
     elif subtopico == "Diferença de dois quadrados":
-        tipo_dq = random.randint(1, 4)
         qp1, raiz1 = random.choice(quadrados_perfeitos)
         qp2, raiz2 = random.choice(quadrados_perfeitos)
         qp1_str, qp2_str = "" if qp1 == 1 else str(qp1), "" if qp2 == 1 else str(qp2)
         r1_str, r2_str = "" if raiz1 == 1 else str(raiz1), "" if raiz2 == 1 else str(raiz2)
-        
-        if tipo_dq == 1:
+        tipo = random.randint(1, 4)
+        if tipo == 1:
             return limpar_expressao(f"Fatore a diferença de dois quadrados: {qp2} - {qp1_str}{v}²"), limpar_expressao(f"({raiz2}+{r1_str}{v})({raiz2}-{r1_str}{v})")
-        elif tipo_dq == 2:
+        elif tipo == 2:
             var_a, var_b = ('a', 'b') if v not in ['a', 'b'] else ('x', 'y')
-            r_a = "" if raiz1 == 1 else str(raiz1)
-            r_b = "" if raiz2 == 1 else str(raiz2)
-            return limpar_expressao(f"Fatore a diferença de dois quadrados: {qp1_str}{var_a}² - {qp2_str}{var_b}²"), limpar_expressao(f"({r_a}{var_a}+{r_b}{var_b})({r_a}{var_a}-{r_b}{var_b})")
-        elif tipo_dq == 3:
+            return limpar_expressao(f"Fatore a diferença de dois quadrados: {qp1_str}{var_a}² - {qp2_str}{var_b}²"), limpar_expressao(f"({"" if raiz1 == 1 else str(raiz1)}{var_a}+{"" if raiz2 == 1 else str(raiz2)}{var_b})({"" if raiz1 == 1 else str(raiz1)}{var_a}-{"" if raiz2 == 1 else str(raiz2)}{var_b})")
+        elif tipo == 3:
             return limpar_expressao(f"Fatore a diferença de dois quadrados: {v}⁴ - {v}²"), limpar_expressao(f"({v}²+{v})({v}²-{v})")
         else:
             return limpar_expressao(f"Fatore a diferença de dois quadrados: {qp1_str}{v}² - {qp2}"), limpar_expressao(f"({r1_str}{v}+{raiz2})({r1_str}{v}-{raiz2})")
@@ -165,125 +113,78 @@ def gerar_questao(subtopico):
     elif subtopico == "Trinômio quadrado perfeito":
         qp1, raiz1 = random.choice(quadrados_perfeitos)
         qp2, raiz2 = random.choice(quadrados_perfeitos)
-        termo_central = 2 * raiz1 * raiz2
         qp1_str, r1_str = "" if qp1 == 1 else str(qp1), "" if raiz1 == 1 else str(raiz1)
-        if random.choice([True, False]):
-            return limpar_expressao(f"Fatore o trinômio quadrado perfeito: {qp1_str}{v}² + {termo_central}{v} + {qp2}"), limpar_expressao(f"({r1_str}{v}+{raiz2})²")
-        else:
-            return limpar_expressao(f"Fatore o trinômio quadrado perfeito: {qp1_str}{v}² - {termo_central}{v} + {qp2}"), limpar_expressao(f"({r1_str}{v}-{raiz2})²")
+        s = random.choice(['+', '-'])
+        return limpar_expressao(f"Fatore o trinômio quadrado perfeito: {qp1_str}{v}² {s} {2 * raiz1 * raiz2}{v} + {qp2}"), limpar_expressao(f"({r1_str}{v}{s}{raiz2})²")
 
-    elif subtopico == "Simplificação de frações":
+    elif subtopico == "Simplificação de fractions":
+        k, a = random.choice([2, 3, 4, 5]), random.choice([1, 2, 3, 4, 5])
         tipo = random.randint(1, 4)
-        k = random.choice([2, 3, 4, 5]) 
-        a = random.choice([1, 2, 3, 4, 5])
-        a2 = a ** 2
-        if tipo == 1:
-            return rf"Simplifique a fração algébrica: \frac{{{k}{v} - {k*a}}}{{{v}^2 - {a2}}}", f"{k}/({v}+{a})"
-        elif tipo == 2:
-            return rf"Simplifique a fração algébrica: \frac{{{v}^2 + {2*a}{v} + {a2}}}{{{k}{v} + {k*a}}}", f"({v}+{a})/{k}"
-        elif tipo == 3:
-            return rf"Simplifique a fração algébrica: \frac{{{v}^2 - {a2}}}{{{v}^2 + {2*a}{v} + {a2}}}", f"({v}-{a})/({v}+{a})"
-        else:
-            return rf"Simplifique a fração algébrica: \frac{{{v}^2 - {2*a}{v} + {a2}}}{{{v}^2 - {a2}}}", f"({v}-{a})/({v}+{a})"
+        if tipo == 1: return rf"Simplifique a fração algébrica: \frac{{{k}{v} - {k*a}}}{{{v}^2 - {a**2}}}", f"{k}/({v}+{a})"
+        elif tipo == 2: return rf"Simplifique a fração algébrica: \frac{{{v}^2 + {2*a}{v} + {a**2}}}{{{k}{v} + {k*a}}}", f"({v}+{a})/{k}"
+        elif tipo == 3: return rf"Simplifique a fração algébrica: \frac{{{v}^2 - {a**2}}}{{{v}^2 + {2*a}{v} + {a**2}}}", f"({v}-{a})/({v}+{a})"
+        else: return rf"Simplifique a fração algébrica: \frac{{{v}^2 - {2*a}{v} + {a**2}}}{{{v}^2 - {a**2}}}", f"({v}-{a})/({v}+{a})"
 
     # --- EQUAÇÕES DO 2º GRAU ---
     elif subtopico == "ax² = 0":
-        a = random.choice(intervalo_20)
-        return limpar_expressao(f"Determine as raízes da equação: {a}x² = 0"), "0"
+        return limpar_expressao(f"Determine as raízes da equação: {random.choice(intervalo_20)}x² = 0"), "0"
 
     elif subtopico == "ax² + bx = 0":
-        a = random.choice([x for x in range(-5, 6) if x != 0])
+        co_a = random.choice([x for x in range(-5, 6) if x != 0])
         x2 = random.choice([x for x in range(-15, 16) if x != 0])
-        b = -a * x2
-        sinal = "+" if b > 0 else "-"
-        return limpar_expressao(f"Determine as raízes da equação: {a}x² {sinal} {abs(b)}x = 0"), f"0;{x2}"
+        b_coef = -co_a * x2
+        return limpar_expressao(f"Determine as raízes da equação: {co_a}x² {'+' if b_coef > 0 else '-'} {abs(b_coef)}x = 0"), f"0;{x2}"
 
     elif subtopico == "ax² + c = 0":
-        if random.choice([True, False]):
-            raiz = random.randint(1, 10)
-            a = random.choice([1, 2, 3, 4])
-            c = -(a * (raiz**2))
-            sinal = "+" if c > 0 else "-"
-            return limpar_expressao(f"Determine as raízes da equação: {a}x² {sinal} {abs(c)} = 0"), f"{raiz};-{raiz}"
+        # 90% de chance de existir raiz real, 10% de não existir
+        if random.random() < 0.90:
+            raiz = random.choice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) # Ampla gama de quadrados perfeitos
+            co_a = random.choice([1, 2, 3, 4])
+            c_coef = -(co_a * (raiz**2))
+            return limpar_expressao(f"Determine as raízes da equação: {co_a}x² - {abs(c_coef)} = 0"), f"{raiz};-{raiz}"
         else:
-            a = random.randint(1, 10)
-            c = random.randint(1, 50)
-            return limpar_expressao(f"Determine as raízes da equação: {a}x² + {c} = 0"), "não existe"
+            return limpar_expressao(f"Determine as raízes da equação: {random.randint(1, 10)}x² + {random.randint(1, 50)} = 0"), "não existe"
 
     return "2 + 2", "4"
 
 # --- CONTROLE DE ESTADO DO APP ---
-if 'tela' not in st.session_state:
-    st.session_state.tela = 'inicio'
-    st.session_state.nome = ''
-    st.session_state.turma = ''
-    st.session_state.acertos = 0
-    st.session_state.num_questao = 1
-    st.session_state.respondido = False
-    st.session_state.feedback = ""
-    st.session_state.feedback_tipo = "info"
-    st.session_state.logado_professor = False
-    st.session_state.eixo_escolhido = ""
+for key, value in [('tela', 'inicio'), ('nome', ''), ('turma', ''), ('acertos', 0), ('num_questao', 1), ('respondido', False), ('feedback', ''), ('feedback_tipo', 'info'), ('logado_professor', False), ('eixo_escolhido', '')]:
+    if key not in st.session_state: st.session_state[key] = value
 
 # --- TELA 1: IDENTIFICAÇÃO ---
 if st.session_state.tela == 'inicio':
     st.markdown("<h1 class='titulo'>EXERCÍCIOS PARA PRATICAR</h1>", unsafe_allow_html=True)
     st.markdown("<div class='sub-prof'>👨‍🏫 Professor: Flávio Antunes de Almeida</div>", unsafe_allow_html=True)
-    
     nome = st.text_input("Nome Completo do Estudante:")
     turma = st.text_input("Sua Turma (Ex: 9º A):")
-    
     if st.button("INICIAR QUIZ"):
         if nome and turma:
-            st.session_state.nome = nome
-            st.session_state.turma = turma
-            st.session_state.tela = 'eixos_principais'
+            st.session_state.nome, st.session_state.turma, st.session_state.tela = nome, turma, 'eixos_principais'
             st.rerun()
-        else:
-            st.error("Por favor, preencha seu nome e turma.")
+        else: st.error("Por favor, preencha seu nome e turma.")
 
 # --- TELA 1B: EIXOS PRINCIPAIS ---
 elif st.session_state.tela == 'eixos_principais':
     st.markdown(f"### Olá, {st.session_state.nome}! Selecione a grande área do conteúdo:")
-    
-    if st.button("PRODUTOS NOTÁVEIS"):
-        st.session_state.eixo_escolhido = "produtos_notaveis"
-        st.session_state.tela = 'subtopicos'
-        st.rerun()
-        
-    if st.button("FATORAÇÃO"):
-        st.session_state.eixo_escolhido = "fatoracao"
-        st.session_state.tela = 'subtopicos'
-        st.rerun()
-        
-    if st.button("EQUAÇÃO DO SEGUNDO GRAU"):
-        st.session_state.eixo_escolhido = "equacao_2grau"
-        st.session_state.tela = 'subtopicos'
-        st.rerun()
+    for b_nome, eixo in [("PRODUTOS NOTÁVEIS", "produtos_notaveis"), ("FATORAÇÃO", "fatoracao"), ("EQUAÇÃO DO SEGUNDO GRAU", "equacao_2grau")]:
+        if st.button(b_nome):
+            st.session_state.eixo_escolhido, st.session_state.tela = eixo, 'subtopicos'
+            st.rerun()
 
 # --- TELA 2: SELEÇÃO DE SUBTÓPICOS ---
 elif st.session_state.tela == 'subtopicos':
     st.markdown("### Selecione o tópico específico para treinar:")
-    
-    opcoes = []
-    if st.session_state.eixo_escolhido == "produtos_notaveis":
-        opcoes = ["Quadrado da soma de 2 termos", "Quadrado da diferença de 2 termos", "Produto da soma pela diferença"]
-    elif st.session_state.eixo_escolhido == "fatoracao":
-        opcoes = ["Fator comum", "Agrupamento", "Diferença de dois quadrados", "Trinômio quadrado perfeito", "Simplificação de frações"]
-    elif st.session_state.eixo_escolhido == "equacao_2grau":
-        opcoes = ["ax² = 0", "ax² + bx = 0", "ax² + c = 0"]
-        
-    for opcao in opcoes:
+    opcoes_map = {
+        "produtos_notaveis": ["Quadrado da soma de 2 termos", "Quadrado da diferença de 2 termos", "Produto da soma pela diferença"],
+        "fatoracao": ["Fator comum", "Agrupamento", "Diferença de dois quadrados", "Trinômio quadrado perfeito", "Simplificação de frações"],
+        "equacao_2grau": ["ax² = 0", "ax² + bx = 0", "ax² + c = 0"]
+    }
+    for opcao in opcoes_map.get(st.session_state.eixo_escolhido, []):
         if st.button(opcao):
             st.session_state.subtopico = opcao
             st.session_state.pergunta, st.session_state.resposta_certa = gerar_questao(opcao)
-            st.session_state.tela = 'quiz'
-            st.session_state.num_questao = 1
-            st.session_state.acertos = 0
-            st.session_state.respondido = False
-            st.session_state.feedback = ""
+            st.session_state.tela, st.session_state.num_questao, st.session_state.acertos, st.session_state.respondido, st.session_state.feedback = 'quiz', 1, 0, False, ""
             st.rerun()
-            
     if st.button("⬅ Voltar aos Temas Principais"):
         st.session_state.tela = 'eixos_principais'
         st.rerun()
@@ -291,32 +192,19 @@ elif st.session_state.tela == 'subtopicos':
 # --- TELA 3: O QUIZ ---
 elif st.session_state.tela == 'quiz':
     st.write(f"**Questão {st.session_state.num_questao} de 10** — *{st.session_state.subtopico}*")
-    
     eh_equacao = "equação" in st.session_state.pergunta.lower()
-    
     if eh_equacao:
         st.info("💡 Insira a resposta dentro das chaves separando as raízes por ponto e vírgula. Se não houver raízes reais, apague tudo dentro das chaves e digite: não existe")
 
-    # Renderização da fração em LaTeX
     if "frac" in st.session_state.pergunta:
         partes = st.session_state.pergunta.split(":")
-        enunciado = partes[0] + ":"
-        expressao_latex = partes[1].strip()
-        
-        st.markdown(f"## {enunciado}")
-        st.latex(expressao_latex)
-    else:
-        st.markdown(f"## {st.session_state.pergunta}")
+        st.markdown(f"## {partes[0]}:")
+        st.latex(partes[1].strip())
+    else: st.markdown(f"## {st.session_state.pergunta}")
     
-    # Campo com S = { } para equações ou limpo para os outros
-    valor_padrao = "S = { }" if eh_equacao else ""
-    resposta_aluno = st.text_input("Sua resposta:", value=valor_padrao, key=f"resp_{st.session_state.num_questao}", disabled=st.session_state.respondido)
-    
+    resposta_aluno = st.text_input("Sua resposta:", value="S = { }" if eh_equacao else "", key=f"resp_{st.session_state.num_questao}", disabled=st.session_state.respondido)
     if st.session_state.feedback:
-        if st.session_state.feedback_tipo == "success":
-            st.success(st.session_state.feedback)
-        else:
-            st.error(st.session_state.feedback)
+        st.success(st.session_state.feedback) if st.session_state.feedback_tipo == "success" else st.error(st.session_state.feedback)
 
     if not st.session_state.respondido:
         if st.button("Enviar Resposta"):
@@ -326,62 +214,36 @@ elif st.session_state.tela == 'quiz':
                 resp_limpa_aluno = resposta_aluno.replace(" ", "").lower().replace("–", "-")
                 resp_limpa_certa = st.session_state.resposta_certa.replace(" ", "").lower()
                 
-                # Captura o valor de dentro de S={...} se for equação
                 if eh_equacao:
                     match_aluno = re.search(r's=\{(.*?)\}', resp_limpa_aluno)
-                    if match_aluno:
-                        resp_limpa_aluno = match_aluno.group(1)
-                    else:
-                        resp_limpa_aluno = resp_limpa_aluno.replace("s={", "").replace("}", "")
+                    resp_limpa_aluno = match_aluno.group(1) if match_aluno else resp_limpa_aluno.replace("s={", "").replace("}", "")
 
                 sucesso = False
-                
-                # Validação para duas raízes com ordem livre (usando ";")
-                if ";" in resp_limpa_certa:
-                    partes_certas = resp_limpa_certa.split(";")
-                    if ";" in resp_limpa_aluno:
-                        partes_aluno = resp_limpa_aluno.split(";")
-                        if sorted(partes_certas) == sorted(partes_aluno): 
-                            sucesso = True
-                # Validação para fatores em ordem trocada ex: (a+b)(a-b)
-                elif ")(" in resp_limpa_certa:
-                    partes_certas = resp_limpa_certa.strip("()").split(")(")
-                    if ")(" in resp_limpa_aluno:
-                        partes_aluno = resp_limpa_aluno.strip("()").split(")(")
-                        if sorted(partes_certas) == sorted(partes_aluno): 
-                            sucesso = True
-                else:
-                    if resp_limpa_aluno == resp_limpa_certa: 
-                        sucesso = True
+                if ";" in resp_limpa_certa and ";" in resp_limpa_aluno and sorted(resp_limpa_certa.split(";")) == sorted(resp_limpa_aluno.split(";")):
+                    sucesso = True
+                elif ")(" in resp_limpa_certa and ")(" in resp_limpa_aluno and sorted(resp_limpa_certa.strip("()").split(")(")) == sorted(resp_limpa_aluno.strip("()").split(")(")):
+                    sucesso = True
+                elif resp_limpa_aluno == resp_limpa_certa:
+                    sucesso = True
 
                 if sucesso:
-                    st.session_state.feedback = "Correto! 🎉"
-                    st.session_state.feedback_tipo = "success"
-                    st.session_state.acertos += 1
+                    st.session_state.feedback, st.session_state.feedback_tipo, st.session_state.acertos = "Correto! 🎉", "success", st.session_state.acertos + 1
                 else:
-                    gabarito_exibicao = f"S = {{ {st.session_state.resposta_certa} }}" if eh_equacao and st.session_state.resposta_certa != "não existe" else st.session_state.resposta_certa
-                    st.session_state.feedback = f"Errado. A resposta correta era: {gabarito_exibicao}"
-                    st.session_state.feedback_tipo = "error"
-                
+                    gabarito = f"S = {{ {st.session_state.resposta_certa} }}" if eh_equacao and st.session_state.resposta_certa != "não existe" else st.session_state.resposta_certa
+                    st.session_state.feedback, st.session_state.feedback_tipo = f"Errado. A resposta correta era: {gabarito}", "error"
                 st.session_state.respondido = True
                 st.rerun()
     else:
         if st.button("Avançar para a Próxima"):
-            st.session_state.feedback = "" 
+            st.session_state.feedback = ""
             if st.session_state.num_questao < 10:
                 st.session_state.num_questao += 1
                 st.session_state.pergunta, st.session_state.resposta_certa = gerar_questao(st.session_state.subtopico)
                 st.session_state.respondido = False
-                st.rerun()
             else:
-                historico_notas.append({
-                    "Nome": st.session_state.nome,
-                    "Turma": st.session_state.turma,
-                    "Conteúdo": st.session_state.subtopico,
-                    "Nota (Acertos)": st.session_state.acertos
-                })
+                historico_notas.append({"Nome": st.session_state.nome, "Turma": st.session_state.turma, "Conteúdo": st.session_state.subtopico, "Nota (Acertos)": st.session_state.acertos})
                 st.session_state.tela = 'fim'
-                st.rerun()
+            st.rerun()
 
 # --- TELA 4: FIM ---
 elif st.session_state.tela == 'fim':
@@ -389,11 +251,8 @@ elif st.session_state.tela == 'fim':
     st.markdown("<h2 style='color:#10B981; text-align:center;'>Exercícios Concluídos!</h2>", unsafe_allow_html=True)
     st.write(f"Muito bem, **{st.session_state.nome}** da turma **{st.session_state.turma}**!")
     st.metric(label="Rendimento Final", value=f"{st.session_state.acertos} / 10 acertos")
-    
     if st.button("Voltar ao Menu Principal"):
-        st.session_state.tela = 'inicio'
-        st.session_state.num_questao = 1
-        st.session_state.acertos = 0
+        st.session_state.tela, st.session_state.num_questao, st.session_state.acertos = 'inicio', 1, 0
         st.rerun()
 
 # --- ÁREA DO PROFESSOR ---
@@ -401,32 +260,22 @@ st.markdown("---")
 with st.expander("🔐 Painel de Notas do Professor"):
     if not st.session_state.logado_professor:
         senha = st.text_input("Digite a senha de acesso:", type="password", key="senha_prof")
-        
-        if st.button("Acessar Notas"):
-            if senha == "juju2025":
-                st.session_state.logado_professor = True
-                st.rerun()
-            else:
-                st.error("Senha incorreta. Tente novamente.")
+        if st.button("Acessar Notas") and senha == "juju2025":
+            st.session_state.logado_professor = True
+            st.rerun()
+        elif senha: st.error("Senha incorreta.")
     else:
         st.success("Acesso liberado!")
-        
-        if not historico_notas:
-            st.info("Nenhum aluno realizou o treino até o momento.")
+        if not historico_notas: st.info("Nenhum aluno realizou o treino até o momento.")
         else:
             st.markdown("### 📊 Relatório Estatístico")
-            notas_ordenadas = sorted(historico_notas, key=lambda x: x["Nota (Acertos)"], reverse=True)
-            st.table(notas_ordenadas)
-            
-            st.markdown("---")
+            st.table(sorted(historico_notas, key=lambda x: x["Nota (Acertos)"], reverse=True))
             if st.button("🚨 LIMPAR HISTÓRICO DE NOTAS DEFINITIVAMENTE"):
                 historico_notas.clear()
-                st.warning("O histórico de notas foi resetado!")
+                st.warning("O histórico foi resetado!")
                 st.rerun()
-        
         if st.button("Fechar Painel"):
             st.session_state.logado_professor = False
             st.rerun()
 
-# --- RODAPÉ GERAL ---
 st.markdown("<div class='rodape'>Criado por: Flávio Antunes de Almeida</div>", unsafe_allow_html=True)
