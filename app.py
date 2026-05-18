@@ -25,9 +25,8 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- GERADOR DE QUESTÕES ATUALIZADO ---
+# --- GERADOR DE QUESTÕES AMPLIADO ---
 def gerar_questao(subtopico):
-    # Intervalos solicitados
     intervalo_20 = [x for x in range(-20, 21) if x != 0]
     quadrados_perfeitos = [(1, 1), (4, 2), (9, 3), (16, 4), (25, 5), (36, 6), (49, 7), (64, 8), (81, 9), (100, 10)]
     
@@ -36,25 +35,78 @@ def gerar_questao(subtopico):
 
     # --- PRODUTOS NOTÁVEIS ---
     if subtopico == "Quadrado da soma de 2 termos":
-        a = abs(random.choice(intervalo_20))
-        b = abs(random.choice(intervalo_20))
-        # (ax + b)² = a²x² + 2abx + b²
-        termo_a = f"{a**2}{v}²" if a != 1 else f"{v}²"
-        return f"Desenvolva o produto notável: ({a if a != 1 else ''}{v} + {b})²", f"{termo_a}+{2*a*b}{v}+{b**2}"
+        tipo = random.randint(1, 3)
+        a = abs(random.choice([1, 2, 3, 4, 5]))
+        b = abs(random.choice([1, 2, 3, 4, 5]))
+        
+        if tipo == 1:
+            # Caso 1: Uma variável e um número fixo (ex: (2x + 3)²)
+            t1 = f"{a if a != 1 else ''}{v}"
+            resp = f"{a**2}{v}²+{2*a*b}{v}+{b**2}" if a != 1 else f"{v}²+{2*b}{v}+{b**2}"
+            return f"Desenvolva o produto notável: ({t1} + {b})²", resp
+        elif tipo == 2:
+            # Caso 2: Duas variáveis distintas (ex: (2x + y)²)
+            t1 = f"{a if a != 1 else ''}{v}"
+            t2 = f"{b if b != 1 else ''}{v2}"
+            coef_meio = 2 * a * b
+            resp = f"{a**2}{v}²+{coef_meio}{v}{v2}+{b**2}{v2}²"
+            # Limpezas de coeficientes unitários na resposta
+            resp = resp.replace("1", "") if "1" in resp and a==1 or b==1 else resp
+            return f"Desenvolva o produto notável: ({t1} + {t2})²", resp
+        else:
+            # Caso 3: Variável ao quadrado + variável simples (ex: (4x² + 5x)²)
+            # (a x² + b x)² = a²x⁴ + 2abx³ + b²x²
+            t1 = f"{a if a != 1 else ''}{v}²"
+            t2 = f"{b if b != 1 else ''}{v}"
+            resp = f"{a**2}{v}⁴+{2*a*b}{v}³+{b**2}{v}²"
+            return f"Desenvolva o produto notável: ({t1} + {t2})²", resp
 
     elif subtopico == "Quadrado da diferença de 2 termos":
-        a = abs(random.choice(intervalo_20))
-        b = abs(random.choice(intervalo_20))
-        # (ax - b)² = a²x² - 2abx + b²
-        termo_a = f"{a**2}{v}²" if a != 1 else f"{v}²"
-        return f"Desenvolva o produto notável: ({a if a != 1 else ''}{v} - {b})²", f"{termo_a}-{2*a*b}{v}+{b**2}"
+        tipo = random.randint(1, 3)
+        a = abs(random.choice([1, 2, 3, 4, 5]))
+        b = abs(random.choice([1, 2, 3, 4, 5]))
+        
+        if tipo == 1:
+            # Caso 1: (2x - 3)²
+            t1 = f"{a if a != 1 else ''}{v}"
+            resp = f"{a**2}{v}²-{2*a*b}{v}+{b**2}" if a != 1 else f"{v}²-{2*b}{v}+{b**2}"
+            return f"Desenvolva o produto notável: ({t1} - {b})²", resp
+        elif tipo == 2:
+            # Caso 2: Duas variáveis distintas (ex: (3a - 2b)²)
+            t1 = f"{a if a != 1 else ''}{v}"
+            t2 = f"{b if b != 1 else ''}{v2}"
+            coef_meio = 2 * a * b
+            resp = f"{a**2}{v}²-{coef_meio}{v}{v2}+{b**2}{v2}²"
+            return f"Desenvolva o produto notável: ({t1} - {t2})²", resp
+        else:
+            # Caso 3: Potência misturada (ex: (3x² - 2x)²)
+            t1 = f"{a if a != 1 else ''}{v}²"
+            t2 = f"{b if b != 1 else ''}{v}"
+            resp = f"{a**2}{v}⁴-{2*a*b}{v}³+{b**2}{v}²"
+            return f"Desenvolva o produto notável: ({t1} - {t2})²", resp
 
     elif subtopico == "Produto da soma pela diferença":
-        a = abs(random.choice(intervalo_20))
-        b = abs(random.choice(intervalo_20))
-        # (ax + b)(ax - b) = a²x² - b²
-        termo_a = f"{a**2}{v}²" if a != 1 else f"{v}²"
-        return f"Desenvolva o produto notável: ({a if a != 1 else ''}{v} + {b})({a if a != 1 else ''}{v} - {b})", f"{termo_a}-{b**2}"
+        tipo = random.randint(1, 3)
+        a = abs(random.choice([1, 2, 3, 4, 5]))
+        b = abs(random.choice([1, 2, 3, 4, 5]))
+        
+        if tipo == 1:
+            # Caso 1: (2x + 3)(2x - 3) = 4x² - 9
+            t1 = f"{a if a != 1 else ''}{v}"
+            resp = f"{a**2}{v}²-{b**2}" if a != 1 else f"{v}²-{b**2}"
+            return f"Desenvolva o produto notável: ({t1} + {b})({t1} - {b})", resp
+        elif tipo == 2:
+            # Caso 2: Duas variáveis (ex: (2x + y)(2x - y) = 4x² - y²)
+            t1 = f"{a if a != 1 else ''}{v}"
+            t2 = f"{b if b != 1 else ''}{v2}"
+            resp = f"{a**2}{v}²-{b**2}{v2}²"
+            return f"Desenvolva o produto notável: ({t1} + {t2})({t1} - {t2})", resp
+        else:
+            # Caso 3: Expoente maior (ex: (4x² + 5x)(4x² - 5x) = 16x⁴ - 25x²)
+            t1 = f"{a if a != 1 else ''}{v}²"
+            t2 = f"{b if b != 1 else ''}{v}"
+            resp = f"{a**2}{v}⁴-{b**2}{v}²"
+            return f"Desenvolva o produto notável: ({t1} + {t2})({t1} - {t2})", resp
 
     # --- FATORAÇÃO ---
     elif subtopico == "Fator comum":
@@ -144,24 +196,20 @@ def gerar_questao(subtopico):
         return f"Determine as raízes da equação: {a}x² = 0", "0"
 
     elif subtopico == "ax² + bx = 0":
-        # Raízes precisam ser inteiras. Raiz 1 = 0, Raiz 2 = x2 (inteiro diferente de zero entre -20 e 20 para caber no limite de coeficientes de -100 a 100)
         a = random.choice([x for x in range(-5, 6) if x != 0])
         x2 = random.choice([x for x in range(-15, 16) if x != 0])
-        b = -a * x2 # ax² + bx = 0 -> ax(x + b/a) = 0 -> x = -b/a -> x2 = -b/a -> b = -a*x2
+        b = -a * x2
         sinal = "+" if b > 0 else "-"
         return f"Determine as raízes da equação: {a}x² {sinal} {abs(b)}x = 0", f"0;{x2}"
 
     elif subtopico == "ax² + c = 0":
-        # Duas opções: Raiz existe (exata) ou Não Existe
         if random.choice([True, False]):
-            # Existe: x = ±raiz
             raiz = random.randint(1, 10)
             a = random.choice([1, 2, 3, 4])
             c = -(a * (raiz**2))
             sinal = "+" if c > 0 else "-"
             return f"Determine as raízes da equação: {a}x² {sinal} {abs(c)} = 0", f"{raiz};-{raiz}"
         else:
-            # Não existe reais (a e c com mesmo sinal)
             a = random.randint(1, 10)
             c = random.randint(1, 50)
             return f"Determine as raízes da equação: {a}x² + {c} = 0", "não existe"
@@ -183,7 +231,7 @@ if 'tela' not in st.session_state:
 
 # --- TELA 1: IDENTIFICAÇÃO ---
 if st.session_state.tela == 'inicio':
-    st.markdown("<h1 class='titulo'>LISTA DE EXERCÍCIOS 2</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 class='titulo'>EXERCÍCIOS PARA PRATICAR</h1>", unsafe_allow_html=True)
     st.markdown("<div class='sub-prof'>👨‍🏫 Professor: Flávio Antunes de Almeida</div>", unsafe_allow_html=True)
     
     nome = st.text_input("Nome Completo do Estudante:")
@@ -248,7 +296,6 @@ elif st.session_state.tela == 'subtopicos':
 elif st.session_state.tela == 'quiz':
     st.write(f"**Questão {st.session_state.num_questao} de 10** — *{st.session_state.subtopico}*")
     
-    # Instrução condicional para equações que possuem duas raízes
     if "equação" in st.session_state.pergunta.lower():
         st.info("💡 Se houver duas raízes, separe-as por ponto e vírgula sem espaços (Exemplo: 2;-2). Se não existirem raízes reais, digite: não existe")
 
@@ -281,14 +328,14 @@ elif st.session_state.tela == 'quiz':
                 
                 sucesso = False
                 
-                # Validação especial para duas raízes separadas por ";" (Permite inversão)
+                # Validação para duas raízes separadas por ";" (Permite inversão)
                 if ";" in resp_limpa_certa:
                     partes_certas = resp_limpa_certa.split(";")
                     if ";" in resp_limpa_aluno:
                         partes_aluno = resp_limpa_aluno.split(";")
                         if sorted(partes_certas) == sorted(partes_aluno): 
                             sucesso = True
-                # Validação para ordens trocadas de fatores ex: (a+b)(a-b)
+                # Validação para ordens trocadas de fatores algébricos ex: (a+b)(a-b)
                 elif ")(" in resp_limpa_certa:
                     partes_certas = resp_limpa_certa.strip("()").split(")(")
                     if ")(" in resp_limpa_aluno:
