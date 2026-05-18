@@ -131,18 +131,33 @@ def gerar_questao(subtopico):
         else:
             return f"Fatore o trinômio quadrado perfeito: {qp1_str}{v}² - {termo_central}{v} + {qp2}", f"({r1_str}{v}-{raiz2})²"
 
-    # 5) SIMPLIFICAÇÃO DE FRAÇÕES ALGÉBRICAS (CORRIGIDO)
+    # 5) SIMPLIFICAÇÃO DE FRAÇÕES ALGÉBRICAS (CORRIGIDO E SIMPLIFICADO)
     elif subtopico == "Simplificação de frações":
-        tipo = random.randint(1, 3)
+        tipo = random.randint(1, 4)
+        # Valores baixos e fixos e positivos para evitar problemas de visualização e duplo sinal
+        k = random.choice([2, 3, 4, 5]) 
+        a = random.choice([1, 2, 3, 4, 5])
+        a2 = a ** 2
+        
         if tipo == 1:
-            k = random.choice(intervalo_amplo)
-            return rf"Simplifique a fração algébrica: \frac{{{k}{v} - {k}}}{{{v}^2 - 1}}", f"{k}/({v}+1)"
+            # Numerador: Fator comum | Denominador: Diferença de Quadrados
+            # Ex: (k*x - k*a) / (x² - a²) -> k(x - a) / (x - a)(x + a) -> k / (x + a)
+            return rf"Simplifique a fração algébrica: \frac{{{k}{v} - {k*a}}}{{{v}^2 - {a2}}}", f"{k}/({v}+{a})"
+            
         elif tipo == 2:
-            _, k = random.choice(quadrados_perfeitos)
-            return rf"Simplifique a fração algébrica: \frac{{{v}^2 + {2*k}{v} + {k**2}}}{{{v} + {k}}}", f"{v}+{k}"
+            # Numerador: Trinômio Quadrado Perfeito (+) | Denominador: Fator comum
+            # Ex: (x² + 2ax + a²) / (k*x + k*a) -> (x + a)² / k(x + a) -> (x + a) / k
+            return rf"Simplifique a fração algébrica: \frac{{{v}^2 + {2*a}{v} + {a2}}}{{{k}{v} + {k*a}}}", f"({v}+{a})/{k}"
+            
+        elif tipo == 3:
+            # Numerador: Diferença de Quadrados | Denominador: Trinômio Quadrado Perfeito (+)
+            # Ex: (x² - a²) / (x² + 2ax + a²) -> (x - a)(x + a) / (x + a)² -> (x - a) / (x + a)
+            return rf"Simplifique a fração algébrica: \frac{{{v}^2 - {a2}}}{{{v}^2 + {2*a}{v} + {a2}}}", f"({v}-{a})/({v}+{a})"
+            
         else:
-            _, k = random.choice(quadrados_perfeitos)
-            return rf"Simplifique a fração algébrica: \frac{{{v}^2 - {k**2}}}{{{v}^2 + {2*k}{v} + {k**2}}}", f"({v}-{k})/({v}+{k})"
+            # Numerador: Trinômio Quadrado Perfeito (-) | Denominador: Diferença de Quadrados
+            # Ex: (x² - 2ax + a²) / (x² - a²) -> (x - a)² / (x - a)(x + a) -> (x - a) / (x + a)
+            return rf"Simplifique a fração algébrica: \frac{{{v}^2 - {2*a}{v} + {a2}}}{{{v}^2 - {a2}}}", f"({v}-{a})/({v}+{a})"
 
     return "2 + 2", "4"
 
